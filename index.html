@@ -18,13 +18,13 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-image: linear-gradient(to bottom right, #f3e8ff, #e5d7ff, #d7e5ff, #f0f4ff);
             background-attachment: fixed;
             transition: all 0.3s ease;
         }
 
         /* Light mode styling */
         body {
+            background-color: #f3f4f6;
             color: #1f2937;
         }
         .main-container {
@@ -378,12 +378,12 @@
             function applyTheme(theme) {
                 if (theme === 'dark') {
                     document.body.classList.add('dark');
-                    moonIcon.classList.add('hidden');
-                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.remove('hidden');
+                    sunIcon.classList.add('hidden');
                 } else {
                     document.body.classList.remove('dark');
-                    sunIcon.classList.add('hidden');
-                    moonIcon.classList.remove('hidden');
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
                 }
             }
             
@@ -474,16 +474,17 @@
                         }
                     }
                     
-                    badge.addEventListener('click', (e) => {
-                        if (e.ctrlKey || e.metaKey) {
-                             selectedPersonForRemoval = (selectedPersonForRemoval === person) ? null : person;
-                             renderPeopleSelectors();
-                        } else {
-                            originalNameForEdit = person;
-                            editPersonInput.value = person;
-                            showModal('editPersonModal');
-                        }
+                    badge.addEventListener('click', () => {
+                         selectedPersonForRemoval = (selectedPersonForRemoval === person) ? null : person;
+                         renderPeopleSelectors();
                     });
+
+                    badge.addEventListener('dblclick', (e) => {
+                         originalNameForEdit = person;
+                         editPersonInput.value = person;
+                         showModal('editPersonModal');
+                    });
+                    
                     peopleListDiv.appendChild(badge);
                 });
 
@@ -863,7 +864,6 @@
 
             addPersonBtn.addEventListener('click', () => showModal('addPersonModal'));
             cancelAddPersonBtn.addEventListener('click', () => hideModal('addPersonModal'));
-            cancelEditPersonBtn.addEventListener('click', () => hideModal('editPersonModal'));
             
             confirmAddPersonBtn.addEventListener('click', () => {
                 const names = personInput.value.split(',').map(name => name.trim()).filter(name => name !== '');
@@ -873,9 +873,12 @@
                     renderAll();
                     hideModal('addPersonModal');
                     personInput.value = '';
+                } else {
+                    showAlert("Validation Error", "Please enter a valid name.");
                 }
             });
 
+            cancelEditPersonBtn.addEventListener('click', () => hideModal('editPersonModal'));
             confirmEditPersonBtn.addEventListener('click', () => {
                 const newName = editPersonInput.value.trim();
                 if (!newName) {
