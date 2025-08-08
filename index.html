@@ -18,13 +18,13 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(to bottom right, #f3e8ff, #e5d7ff, #d7e5ff, #f0f4ff);
             background-attachment: fixed;
             transition: all 0.3s ease;
         }
 
         /* Light mode styling */
         body {
-            background-color: #f3f4f6;
             color: #1f2937;
         }
         .main-container {
@@ -679,9 +679,9 @@
                 const data = expenses.map(e => [
                     e.description,
                     e.date,
-                    `₹${e.amount.toFixed(2)}`,
+                    `Rs. ${e.amount.toFixed(2)}`,
                     e.paidBy,
-                    `₹${(e.amount / e.splitAmong.length).toFixed(2)}`,
+                    `Rs. ${(e.amount / e.splitAmong.length).toFixed(2)}`,
                     e.splitAmong.join(', ')
                 ]);
 
@@ -704,7 +704,7 @@
                 doc.setFontSize(12);
                 doc.setFont('Helvetica', 'bold');
                 doc.setTextColor('#1f2937');
-                doc.text(`Total Expenses: ₹${totalExpenses.toFixed(2)}`, margin, y);
+                doc.text(`Total Expenses: Rs. ${totalExpenses.toFixed(2)}`, margin, y);
                 y += 10;
 
                 doc.setFontSize(12);
@@ -745,7 +745,7 @@
                     
                     const settlementAmount = Math.min(debtor.amount, creditor.amount);
 
-                    settlements.push(`${debtor.person} pays ₹${settlementAmount.toFixed(2)} to ${creditor.person}.`);
+                    settlements.push(`${debtor.person} pays Rs. ${settlementAmount.toFixed(2)} to ${creditor.person}.`);
 
                     debtor.amount -= settlementAmount;
                     creditor.amount -= settlementAmount;
