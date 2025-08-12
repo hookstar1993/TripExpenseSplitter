@@ -828,7 +828,7 @@
                 const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
                 let y = margin;
                 
-                const currentTourName = tourName || 'Expense Report';
+                const currentTourName = (tourName || 'Expense Report').toUpperCase();
                 
                 doc.setFont('Helvetica', 'bold');
                 doc.setFontSize(22);
