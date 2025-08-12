@@ -535,32 +535,27 @@
                     badge.dataset.name = person;
                     badge.classList.add('px-3', 'py-1', 'rounded-full', 'text-sm', 'font-semibold', 'cursor-pointer', 'transition-colors', 'duration-200');
                     
-                    if (document.body.classList.contains('dark')) {
-                        badge.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-                    } else {
-                        badge.classList.add('bg-blue-200', 'text-blue-900', 'hover:bg-blue-300');
-                    }
-                    
-                    badge.addEventListener('click', () => {
-                        if (document.body.classList.contains('dark')) {
-                            if (badge.classList.contains('bg-blue-600')) {
-                                badge.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-                                badge.classList.add('bg-gray-700', 'text-gray-200', 'hover:bg-gray-600');
-                            } else {
-                                badge.classList.remove('bg-gray-700', 'text-gray-200', 'hover:bg-gray-600');
-                                badge.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-                            }
+                    badge.dataset.selected = 'true';
+
+                    function updateBadgeStyle(b) {
+                        const isSelected = b.dataset.selected === 'true';
+                        const isDark = document.body.classList.contains('dark');
+                        
+                        b.className = 'px-3 py-1 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-200';
+
+                        if (isSelected) {
+                            b.classList.add(...(isDark ? ['bg-blue-600', 'text-white', 'hover:bg-blue-700'] : ['bg-blue-200', 'text-blue-900', 'hover:bg-blue-300']));
                         } else {
-                            if (badge.classList.contains('bg-blue-200')) {
-                                badge.classList.remove('bg-blue-200', 'text-blue-900', 'hover:bg-blue-300');
-                                badge.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                            } else {
-                                badge.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                                badge.classList.add('bg-blue-200', 'text-blue-900', 'hover:bg-blue-300');
-                            }
+                            b.classList.add(...(isDark ? ['bg-gray-700', 'text-gray-200', 'hover:bg-gray-600'] : ['bg-gray-200', 'text-gray-700', 'hover:bg-gray-300']));
                         }
+                    }
+
+                    badge.addEventListener('click', () => {
+                        badge.dataset.selected = badge.dataset.selected === 'true' ? 'false' : 'true';
+                        updateBadgeStyle(badge);
                     });
 
+                    updateBadgeStyle(badge);
                     splitAmongDiv.appendChild(badge);
                 });
 
@@ -571,17 +566,9 @@
                     badge.className = 'px-3 py-1 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-200';
                     
                     if (document.body.classList.contains('dark')) {
-                        if (person === selectedPersonForRemoval) {
-                            badge.classList.add('bg-red-500', 'text-white', 'hover:bg-red-600');
-                        } else {
-                            badge.classList.add('bg-gray-700', 'text-gray-200', 'hover:bg-gray-600');
-                        }
+                        badge.classList.add(person === selectedPersonForRemoval ? 'bg-red-500' : 'bg-gray-700', person === selectedPersonForRemoval ? 'text-white' : 'text-gray-200', person === selectedPersonForRemoval ? 'hover:bg-red-600' : 'hover:bg-gray-600');
                     } else {
-                        if (person === selectedPersonForRemoval) {
-                            badge.classList.add('bg-red-500', 'text-white', 'hover:bg-red-600');
-                        } else {
-                            badge.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                        }
+                        badge.classList.add(person === selectedPersonForRemoval ? 'bg-red-500' : 'bg-gray-200', person === selectedPersonForRemoval ? 'text-white' : 'text-gray-700', person === selectedPersonForRemoval ? 'hover:bg-red-600' : 'hover:bg-gray-300');
                     }
                     
                     badge.addEventListener('click', () => {
@@ -599,11 +586,8 @@
                 });
 
                 removePersonBtn.disabled = people.length <= 1 || selectedPersonForRemoval === null;
-                if (removePersonBtn.disabled) {
-                    removePersonBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    removePersonBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
+                removePersonBtn.classList.toggle('opacity-50', removePersonBtn.disabled);
+                removePersonBtn.classList.toggle('cursor-not-allowed', removePersonBtn.disabled);
             }
 
             function renderExpenses() {
@@ -615,15 +599,11 @@
                 noExpensesMessage.classList.add('hidden');
 
                 expenses.forEach((expense, index) => {
-                    const individualShare = expense.amount / expense.splitAmong.length;
+                    const individualShare = expense.splitAmong.length > 0 ? expense.amount / expense.splitAmong.length : 0;
                     const row = document.createElement('tr');
                     row.className = 'bg-transparent';
                     
-                    if (document.body.classList.contains('dark')) {
-                        row.classList.add('hover:bg-gray-800/20');
-                    } else {
-                        row.classList.add('hover:bg-gray-100');
-                    }
+                    row.classList.add(document.body.classList.contains('dark') ? 'hover:bg-gray-800/20' : 'hover:bg-gray-100');
                     
                     row.innerHTML = `
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${expense.description}</td>
@@ -647,25 +627,47 @@
                     return;
                 }
 
+                const summaryHtml = [];
+                
+                const totalPaid = {};
                 const personBalances = {};
-                people.forEach(person => personBalances[person] = 0);
-
-                expenses.forEach(expense => {
-                    const individualShare = expense.amount / expense.splitAmong.length;
-                    personBalances[expense.paidBy] += expense.amount;
-                    expense.splitAmong.forEach(person => {
-                        personBalances[person] -= individualShare;
-                    });
+                people.forEach(person => {
+                    totalPaid[person] = 0;
+                    personBalances[person] = 0;
                 });
 
-                const summaryHtml = [];
+                expenses.forEach(expense => {
+                    totalPaid[expense.paidBy] += expense.amount;
+                    if (expense.splitAmong.length > 0) {
+                        const individualShare = expense.amount / expense.splitAmong.length;
+                        expense.splitAmong.forEach(person => {
+                            if(personBalances.hasOwnProperty(person)) {
+                                personBalances[person] -= individualShare;
+                            }
+                        });
+                    }
+                    if(personBalances.hasOwnProperty(expense.paidBy)){
+                        personBalances[expense.paidBy] += expense.amount;
+                    }
+                });
+
+                const peopleWhoPaid = people.filter(p => totalPaid[p] > 0);
+                if (peopleWhoPaid.length > 0) {
+                    summaryHtml.push('<h3 class="text-lg font-semibold text-gray-900 mb-2">Total Paid by Each Person:</h3>');
+                    summaryHtml.push('<div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">');
+                    peopleWhoPaid.forEach(person => {
+                        summaryHtml.push(`<span class="text-gray-900">${person}:</span><span class="text-gray-900 font-medium text-right">₹${totalPaid[person].toFixed(2)}</span>`);
+                    });
+                    summaryHtml.push('</div>');
+                    summaryHtml.push('<hr class="my-4 border-gray-300 dark:border-gray-600">');
+                }
+
                 const debtors = [];
                 const creditors = [];
-
                 for (const person in personBalances) {
-                    if (personBalances[person] < 0) {
+                    if (personBalances[person] < -0.01) {
                         debtors.push({ person, amount: Math.abs(personBalances[person]) });
-                    } else if (personBalances[person] > 0) {
+                    } else if (personBalances[person] > 0.01) {
                         creditors.push({ person, amount: personBalances[person] });
                     }
                 }
@@ -673,29 +675,20 @@
                 let debtorIndex = 0;
                 let creditorIndex = 0;
                 const settlements = [];
-
                 while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
                     const debtor = debtors[debtorIndex];
                     const creditor = creditors[creditorIndex];
-                    
                     const settlementAmount = Math.min(debtor.amount, creditor.amount);
-
                     settlements.push(`${debtor.person} pays ₹${settlementAmount.toFixed(2)} to ${creditor.person}.`);
-
                     debtor.amount -= settlementAmount;
                     creditor.amount -= settlementAmount;
-
-                    if (debtor.amount <= 0.01) {
-                        debtorIndex++;
-                    }
-                    if (creditor.amount <= 0.01) {
-                        creditorIndex++;
-                    }
+                    if (debtor.amount <= 0.01) debtorIndex++;
+                    if (creditor.amount <= 0.01) creditorIndex++;
                 }
                 
-                summaryHtml.push('<h3 class="text-lg font-semibold text-gray-900 dark:text-gray-500">Settlements:</h3>');
+                summaryHtml.push('<h3 class="text-lg font-semibold text-gray-900">Final Settlements:</h3>');
                 if (settlements.length > 0) {
-                    summaryHtml.push(`<ul class="list-disc list-inside space-y-1 text-gray-900 dark:text-gray-600">`);
+                    summaryHtml.push(`<ul class="list-disc list-inside space-y-1 text-gray-900">`);
                     settlements.forEach(settlement => summaryHtml.push(`<li>${settlement}</li>`));
                     summaryHtml.push('</ul>');
                 } else {
@@ -727,7 +720,7 @@
                 const amount = parseFloat(amountInput.value);
                 const date = dateInput.value;
                 const paidBy = paidBySelect.value;
-                const splitAmong = Array.from(splitAmongDiv.querySelectorAll('span.bg-blue-600')).map(badge => badge.dataset.name);
+                const splitAmong = Array.from(splitAmongDiv.querySelectorAll('span[data-selected="true"]')).map(badge => badge.dataset.name);
                 
                 if (splitAmong.length === 0) {
                     showAlert("Validation Error", "Please select at least one person to split the expense with.");
@@ -738,17 +731,16 @@
                 saveData();
                 
                 expenseForm.reset();
-                dateInput.value = new Date().toISOString().split('T')[0];
-                renderExpenses();
-                calculateSummary();
+                setTodayDate();
+                renderAll(); 
+                showAlert("Success", "Expense added successfully!");
             });
 
             window.deleteExpense = (index) => {
-                 showConfirm("Delete Expense", `Are you sure you want to delete this expense? This action cannot be undone.`, () => {
+                showConfirm("Delete Expense", `Are you sure you want to delete this expense? This action cannot be undone.`, () => {
                     expenses.splice(index, 1);
                     saveData();
-                    renderExpenses();
-                    calculateSummary();
+                    renderAll();
                 });
             };
 
@@ -775,40 +767,25 @@
                     badge.dataset.name = person;
                     badge.classList.add('px-3', 'py-1', 'rounded-full', 'text-sm', 'font-semibold', 'cursor-pointer', 'transition-colors', 'duration-200');
                     
-                    if (expense.splitAmong.includes(person)) {
-                        if (document.body.classList.contains('dark')) {
-                            badge.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                    badge.dataset.selected = expense.splitAmong.includes(person) ? 'true' : 'false';
+
+                    function updateBadgeStyle(b) {
+                        const isSelected = b.dataset.selected === 'true';
+                        const isDark = document.body.classList.contains('dark');
+                        b.className = 'px-3 py-1 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-200';
+                        if (isSelected) {
+                            b.classList.add(...(isDark ? ['bg-blue-600', 'text-white', 'hover:bg-blue-700'] : ['bg-blue-200', 'text-blue-900', 'hover:bg-blue-300']));
                         } else {
-                            badge.classList.add('bg-blue-200', 'text-blue-900', 'hover:bg-blue-300');
-                        }
-                    } else {
-                        if (document.body.classList.contains('dark')) {
-                            badge.classList.add('bg-gray-700', 'text-gray-200', 'hover:bg-gray-600');
-                        } else {
-                            badge.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                            b.classList.add(...(isDark ? ['bg-gray-700', 'text-gray-200', 'hover:bg-gray-600'] : ['bg-gray-200', 'text-gray-700', 'hover:bg-gray-300']));
                         }
                     }
                     
                     badge.addEventListener('click', () => {
-                        if (document.body.classList.contains('dark')) {
-                            if (badge.classList.contains('bg-blue-600')) {
-                                badge.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-                                badge.classList.add('bg-gray-700', 'text-gray-200', 'hover:bg-gray-600');
-                            } else {
-                                badge.classList.remove('bg-gray-700', 'text-gray-200', 'hover:bg-gray-600');
-                                badge.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-                            }
-                        } else {
-                            if (badge.classList.contains('bg-blue-200')) {
-                                badge.classList.remove('bg-blue-200', 'text-blue-900', 'hover:bg-blue-300');
-                                badge.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                            } else {
-                                badge.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                                badge.classList.add('bg-blue-200', 'text-blue-900', 'hover:bg-blue-300');
-                            }
-                        }
+                        badge.dataset.selected = badge.dataset.selected === 'true' ? 'false' : 'true';
+                        updateBadgeStyle(badge);
                     });
 
+                    updateBadgeStyle(badge);
                     editSplitAmongDiv.appendChild(badge);
                 });
 
@@ -822,7 +799,7 @@
                 const amount = parseFloat(document.getElementById('editExpenseAmount').value);
                 const date = document.getElementById('editExpenseDate').value;
                 const paidBy = document.getElementById('editExpensePaidBy').value;
-                const splitAmong = Array.from(document.querySelectorAll('#editSplitAmong span.bg-blue-600')).map(badge => badge.dataset.name);
+                const splitAmong = Array.from(document.querySelectorAll('#editSplitAmong span[data-selected="true"]')).map(badge => badge.dataset.name);
 
                 if (splitAmong.length === 0) {
                     showAlert("Validation Error", "Please select at least one person to split the expense with.");
@@ -839,12 +816,11 @@
                 const doc = new jsPDF();
                 
                 const margin = 15;
-                const pageHeight = doc.internal.pageSize.height;
+                const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
                 let y = margin;
                 
                 const currentTourName = tourName || 'Expense Report';
-                const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
+                
                 doc.setFont('Helvetica', 'bold');
                 doc.setFontSize(22);
                 doc.setTextColor('#1f2937');
@@ -862,130 +838,127 @@
                     doc.setTextColor('#4b5563');
                     doc.text(`Trip Starts: ${tripStartDate}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
                 }
-                y += 12;
+                
+                doc.autoTable({
+                    head: [['Expenses List']],
+                    body: [],
+                    startY: y + 12,
+                    theme: 'plain',
+                    headStyles: { fontStyle: 'bold', fontSize: 12, textColor: '#1f2937' },
+                    margin: { left: margin }
+                });
 
-                doc.setFontSize(12);
-                doc.setFont('Helvetica', 'bold');
-                doc.setTextColor('#1f2937');
-                doc.text('Expenses List', margin, y);
-                y += 6;
-
-                const headers = [['Description', 'Date', 'Amount', 'Paid By', 'Split Amount', 'Split Among']];
-                const data = expenses.map(e => [
+                const expenseHeaders = [['Description', 'Date', 'Amount', 'Paid By', 'Split Amount', 'Split Among']];
+                const expenseData = expenses.map(e => [
                     e.description,
                     e.date,
                     `Rs. ${e.amount.toFixed(2)}`,
                     e.paidBy,
-                    `Rs. ${(e.amount / e.splitAmong.length).toFixed(2)}`,
+                    `Rs. ${(e.splitAmong.length > 0 ? e.amount / e.splitAmong.length : 0).toFixed(2)}`,
                     e.splitAmong.join(', ')
                 ]);
 
                 doc.autoTable({
-                    startY: y,
-                    head: headers,
-                    body: data,
+                    startY: doc.autoTable.previous.finalY,
+                    head: expenseHeaders, 
+                    body: expenseData,
                     styles: { font: 'Helvetica', cellPadding: 2, fontSize: 8, valign: 'middle' },
-                    headStyles: { 
-                        fillColor: [243, 244, 246], 
-                        textColor: [55, 65, 81], 
-                        fontStyle: 'bold' 
-                    },
+                    headStyles: { fillColor: [243, 244, 246], textColor: [55, 65, 81], fontStyle: 'bold' },
                     bodyStyles: { textColor: [55, 65, 81] },
                     margin: { left: margin, right: margin },
                 });
                 
-                y = doc.autoTable.previous.finalY + 10;
-
-                doc.setFontSize(12);
-                doc.setFont('Helvetica', 'bold');
-                doc.setTextColor('#1f2937');
-                doc.text(`Total Expenses: Rs. ${totalExpenses.toFixed(2)}`, margin, y);
-                y += 10;
-
-                doc.setFontSize(12);
-                doc.setFont('Helvetica', 'bold');
-                doc.setTextColor('#1f2937');
-                doc.text('Final Settlements', margin, y);
-                y += 6;
-
-                const personBalances = {};
-                people.forEach(person => personBalances[person] = 0);
-
-                expenses.forEach(expense => {
-                    const individualShare = expense.amount / expense.splitAmong.length;
-                    personBalances[expense.paidBy] += expense.amount;
-                    expense.splitAmong.forEach(person => {
-                        personBalances[person] -= individualShare;
-                    });
+                const totalPaid = {}, personBalances = {};
+                people.forEach(person => {
+                    totalPaid[person] = 0;
+                    personBalances[person] = 0;
                 });
 
-                const debtors = [];
-                const creditors = [];
-
-                for (const person in personBalances) {
-                    if (personBalances[person] < 0) {
-                        debtors.push({ person, amount: Math.abs(personBalances[person]) });
-                    } else if (personBalances[person] > 0) {
-                        creditors.push({ person, amount: personBalances[person] });
+                expenses.forEach(expense => {
+                    totalPaid[expense.paidBy] += expense.amount;
+                    if (expense.splitAmong.length > 0) {
+                        const individualShare = expense.amount / expense.splitAmong.length;
+                        expense.splitAmong.forEach(person => {
+                            if(personBalances.hasOwnProperty(person)) {
+                                personBalances[person] -= individualShare;
+                            }
+                        });
                     }
+                    if(personBalances.hasOwnProperty(expense.paidBy)){
+                        personBalances[expense.paidBy] += expense.amount;
+                    }
+                });
+
+                const peopleWhoPaid = people.filter(p => totalPaid[p] > 0);
+                if (peopleWhoPaid.length > 0) {
+                    doc.autoTable({
+                        head: [['Total Paid by Each Person']],
+                        body: [],
+                        startY: doc.autoTable.previous.finalY + 10,
+                        theme: 'plain',
+                        headStyles: { fontStyle: 'bold', fontSize: 12, textColor: '#1f2937' },
+                        margin: { left: margin }
+                    });
+                    doc.autoTable({ 
+                        startY: doc.autoTable.previous.finalY, 
+                        head: [['Person', 'Amount Paid']], 
+                        body: peopleWhoPaid.map(p => [p, `Rs. ${totalPaid[p].toFixed(2)}`]), 
+                        styles: { font: 'Helvetica', cellPadding: 2, fontSize: 10 }, 
+                        headStyles: { fillColor: [243, 244, 246], textColor: [55, 65, 81], fontStyle: 'bold' }, 
+                        bodyStyles: { textColor: [55, 65, 81] }, 
+                        margin: { left: margin, right: margin } 
+                    });
                 }
 
-                let debtorIndex = 0;
-                let creditorIndex = 0;
+                const debtors = [], creditors = [];
+                for (const person in personBalances) {
+                    if (personBalances[person] < -0.01) debtors.push({ person, amount: Math.abs(personBalances[person]) });
+                    else if (personBalances[person] > 0.01) creditors.push({ person, amount: personBalances[person] });
+                }
+
+                let debtorIndex = 0, creditorIndex = 0;
                 const settlements = [];
-
                 while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
-                    const debtor = debtors[debtorIndex];
-                    const creditor = creditors[creditorIndex];
-                    
+                    const debtor = debtors[debtorIndex], creditor = creditors[creditorIndex];
                     const settlementAmount = Math.min(debtor.amount, creditor.amount);
-
-                    settlements.push(`${debtor.person} pays Rs. ${settlementAmount.toFixed(2)} to ${creditor.person}.`);
-
+                    settlements.push([debtor.person, creditor.person, `Rs. ${settlementAmount.toFixed(2)}`]);
                     debtor.amount -= settlementAmount;
                     creditor.amount -= settlementAmount;
-
-                    if (debtor.amount <= 0.01) {
-                        debtorIndex++;
-                    }
-                    if (creditor.amount <= 0.01) {
-                        creditorIndex++;
-                    }
+                    if (debtor.amount <= 0.01) debtorIndex++;
+                    if (creditor.amount <= 0.01) creditorIndex++;
                 }
                 
+                doc.autoTable({
+                    head: [['Final Settlements']],
+                    body: [],
+                    startY: doc.autoTable.previous.finalY + 10,
+                    theme: 'plain',
+                    headStyles: { fontStyle: 'bold', fontSize: 12, textColor: '#1f2937' },
+                    margin: { left: margin }
+                });
+
                 if (settlements.length > 0) {
-                    doc.setFont('Helvetica', 'normal');
-                    doc.setTextColor('#1f2937');
-                    settlements.forEach(settlement => {
-                        if (y + 6 > pageHeight - margin - 10) {
-                            doc.addPage();
-                            y = margin;
-                        }
-                        doc.text(settlement, margin, y);
-                        y += 5;
+                     doc.autoTable({
+                        startY: doc.autoTable.previous.finalY,
+                        head: [['Who Pays', 'Who Gets Paid', 'Amount']],
+                        body: settlements,
+                        theme: 'grid',
+                        headStyles: { fillColor: [229, 231, 235], textColor: [55, 65, 81], fontStyle: 'bold' },
+                        styles: { font: 'Helvetica', cellPadding: 2, fontSize: 10 },
+                        margin: { left: margin, right: margin }
                     });
                 } else {
-                    if (y + 6 > pageHeight - margin - 10) {
-                        doc.addPage();
-                        y = margin;
-                    }
-                    doc.setFont('Helvetica', 'normal');
-                    doc.setTextColor('#10b981');
-                    doc.text('Everything is settled!', margin, y);
+                    doc.setFont('Helvetica', 'normal'); doc.setTextColor('#10b981');
+                    doc.text('Everything is settled!', margin, doc.autoTable.previous.finalY + 5);
                 }
 
-                const addFooter = function(page) {
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
                     doc.setFontSize(8);
                     doc.setFont('Helvetica', 'normal');
                     doc.setTextColor('#4b5563');
-                    doc.text(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, margin, pageHeight - margin);
-                    doc.text(`Page ${page}`, doc.internal.pageSize.width - margin, pageHeight - margin, { align: 'right' });
-                };
-                
-                const totalPages = doc.internal.pages.length;
-                for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i);
-                    addFooter(i);
+                    doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - margin, pageHeight - 10, { align: 'right' });
                 }
 
                 doc.save(`${currentTourName.replace(/ /g, '_')}_report.pdf`);
@@ -1092,18 +1065,12 @@
 
                 if (newName && originalNameForEdit) {
                     const index = people.indexOf(originalNameForEdit);
-                    if (index > -1) {
-                        people[index] = newName;
-                    }
+                    if (index > -1) people[index] = newName;
                     
                     expenses.forEach(expense => {
-                        if (expense.paidBy === originalNameForEdit) {
-                            expense.paidBy = newName;
-                        }
+                        if (expense.paidBy === originalNameForEdit) expense.paidBy = newName;
                         const splitIndex = expense.splitAmong.indexOf(originalNameForEdit);
-                        if (splitIndex > -1) {
-                            expense.splitAmong[splitIndex] = newName;
-                        }
+                        if (splitIndex > -1) expense.splitAmong[splitIndex] = newName;
                     });
                     
                     originalNameForEdit = null;
@@ -1116,22 +1083,24 @@
             removePersonBtn.addEventListener('click', () => {
                 if (selectedPersonForRemoval && people.length > 1) {
                     showConfirm("Remove Person", `Are you sure you want to remove ${selectedPersonForRemoval}? This will also remove them from all existing expenses.`, () => {
-                        const index = people.indexOf(selectedPersonForRemoval);
-                        if (index > -1) {
-                            people.splice(index, 1);
-                        }
-                        for (const expense of expenses) {
-                            if (expense.paidBy === selectedPersonForRemoval) {
-                                expense.paidBy = people[0];
-                            }
-                            const splitIndex = expense.splitAmong.indexOf(selectedPersonForRemoval);
-                            if (splitIndex > -1) {
-                                expense.splitAmong.splice(splitIndex, 1);
-                                if (expense.splitAmong.length === 0) {
-                                    expense.splitAmong.push(people[0]);
-                                }
-                            }
-                        }
+                        const personToRemove = selectedPersonForRemoval;
+                        const index = people.indexOf(personToRemove);
+                        if (index > -1) people.splice(index, 1);
+                        
+                        const updatedExpenses = expenses.filter(expense => {
+                            const paidByRemoved = expense.paidBy === personToRemove;
+                            const splitContainsOnlyRemoved = expense.splitAmong.length === 1 && expense.splitAmong[0] === personToRemove;
+                            return !paidByRemoved && !splitContainsOnlyRemoved;
+                        });
+
+                        updatedExpenses.forEach(expense => {
+                            const splitIndex = expense.splitAmong.indexOf(personToRemove);
+                            if (splitIndex > -1) expense.splitAmong.splice(splitIndex, 1);
+                        });
+                        
+                        expenses.length = 0;
+                        expenses.push(...updatedExpenses);
+
                         selectedPersonForRemoval = null;
                         saveData();
                         renderAll();
@@ -1165,9 +1134,7 @@
 
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
-                if (!file) {
-                    return;
-                }
+                if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
@@ -1193,6 +1160,7 @@
                     }
                 };
                 reader.readAsText(file);
+                e.target.value = '';
             });
 
             function renderAll() {
@@ -1203,11 +1171,13 @@
             }
 
             function setTodayDate() {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                dateInput.value = `${year}-${month}-${day}`;
+                if (!dateInput.value) {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    dateInput.value = `${year}-${month}-${day}`;
+                }
             }
 
             applyTheme(savedTheme);
@@ -1240,7 +1210,7 @@
     </script>
     <footer class="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
         <p class="mb-1">© 2025 Quick Expense Split Counter. All Rights Reserved.</p>
-        <p>Designed with ❤️ in INDIA | <a href="https://www.instagram.com/hookstar1993" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">HOOK STAR.</a></p>
+        <p>Designed with ❤️ in INDIA | <a href="https://www.instagram.com/hookstar.fx" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">HOOK STAR.</a></p>
     </footer>
 </body>
 </html>
