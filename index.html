@@ -512,6 +512,15 @@
                 localStorage.setItem('expenses', JSON.stringify(expenses));
             }
 
+            // Function to format date from YYYY-MM-DD to DD/MM/YYYY
+            function formatDate(isoDate) {
+                if (!isoDate || typeof isoDate !== 'string') return '';
+                const parts = isoDate.split('-');
+                if (parts.length !== 3) return isoDate; // Return original if not in expected format
+                const [year, month, day] = parts;
+                return `${day}/${month}/${year}`;
+            }
+
             function renderTourInfo() {
                 mainTitle.textContent = tourName || 'Expense Splitter';
                 tourNameInput.value = tourName === 'Expense Splitter' ? '' : tourName;
@@ -577,9 +586,9 @@
                     });
 
                     badge.addEventListener('dblclick', (e) => {
-                         originalNameForEdit = person;
-                         editPersonInput.value = person;
-                         showModal('editPersonModal');
+                          originalNameForEdit = person;
+                          editPersonInput.value = person;
+                          showModal('editPersonModal');
                     });
                     
                     peopleListDiv.appendChild(badge);
@@ -607,7 +616,7 @@
                     
                     row.innerHTML = `
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${expense.description}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${expense.date}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${formatDate(expense.date)}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">₹${expense.amount.toFixed(2)}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${expense.paidBy}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">₹${individualShare.toFixed(2)}</td>
@@ -718,7 +727,7 @@
                 e.preventDefault();
                 const description = descriptionInput.value;
                 const amount = parseFloat(amountInput.value);
-                const date = dateInput.value;
+                const date = dateInput.value; // Stored as YYYY-MM-DD
                 const paidBy = paidBySelect.value;
                 const splitAmong = Array.from(splitAmongDiv.querySelectorAll('span[data-selected="true"]')).map(badge => badge.dataset.name);
                 
@@ -748,7 +757,7 @@
                 const expense = expenses[index];
                 document.getElementById('editExpenseDescription').value = expense.description;
                 document.getElementById('editExpenseAmount').value = expense.amount;
-                document.getElementById('editExpenseDate').value = expense.date;
+                document.getElementById('editExpenseDate').value = expense.date; // Input requires YYYY-MM-DD
                 const editPaidBySelect = document.getElementById('editExpensePaidBy');
                 editPaidBySelect.innerHTML = '';
                 people.forEach(person => {
@@ -797,7 +806,7 @@
             function saveEditedExpense(index) {
                 const description = document.getElementById('editExpenseDescription').value;
                 const amount = parseFloat(document.getElementById('editExpenseAmount').value);
-                const date = document.getElementById('editExpenseDate').value;
+                const date = document.getElementById('editExpenseDate').value; // Stored as YYYY-MM-DD
                 const paidBy = document.getElementById('editExpensePaidBy').value;
                 const splitAmong = Array.from(document.querySelectorAll('#editSplitAmong span[data-selected="true"]')).map(badge => badge.dataset.name);
 
@@ -831,18 +840,19 @@
                     doc.setFontSize(10);
                     doc.setFont('Helvetica', 'normal');
                     doc.setTextColor('#4b5563');
-                    doc.text(`Trip Dates: ${tripStartDate} to ${tripEndDate}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
+                    doc.text(`Trip Dates: ${formatDate(tripStartDate)} to ${formatDate(tripEndDate)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
                 } else if (tripStartDate) {
                     doc.setFontSize(10);
                     doc.setFont('Helvetica', 'normal');
                     doc.setTextColor('#4b5563');
-                    doc.text(`Trip Starts: ${tripStartDate}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
+                    doc.text(`Trip Starts: ${formatDate(tripStartDate)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
                 }
-                
+                y += 12;
+
                 doc.autoTable({
                     head: [['Expenses List']],
                     body: [],
-                    startY: y + 12,
+                    startY: y,
                     theme: 'plain',
                     headStyles: { fontStyle: 'bold', fontSize: 12, textColor: '#1f2937' },
                     margin: { left: margin }
@@ -851,7 +861,7 @@
                 const expenseHeaders = [['Description', 'Date', 'Amount', 'Paid By', 'Split Amount', 'Split Among']];
                 const expenseData = expenses.map(e => [
                     e.description,
-                    e.date,
+                    formatDate(e.date),
                     `Rs. ${e.amount.toFixed(2)}`,
                     e.paidBy,
                     `Rs. ${(e.splitAmong.length > 0 ? e.amount / e.splitAmong.length : 0).toFixed(2)}`,
@@ -939,25 +949,27 @@
 
                 if (settlements.length > 0) {
                      doc.autoTable({
-                        startY: doc.autoTable.previous.finalY,
-                        head: [['Who Pays', 'Who Gets Paid', 'Amount']],
-                        body: settlements,
-                        theme: 'grid',
-                        headStyles: { fillColor: [229, 231, 235], textColor: [55, 65, 81], fontStyle: 'bold' },
-                        styles: { font: 'Helvetica', cellPadding: 2, fontSize: 10 },
-                        margin: { left: margin, right: margin }
-                    });
+                         startY: doc.autoTable.previous.finalY,
+                         head: [['Who Pays', 'Who Gets Paid', 'Amount']],
+                         body: settlements,
+                         theme: 'grid',
+                         headStyles: { fillColor: [229, 231, 235], textColor: [55, 65, 81], fontStyle: 'bold' },
+                         styles: { font: 'Helvetica', cellPadding: 2, fontSize: 10 },
+                         margin: { left: margin, right: margin }
+                     });
                 } else {
                     doc.setFont('Helvetica', 'normal'); doc.setTextColor('#10b981');
                     doc.text('Everything is settled!', margin, doc.autoTable.previous.finalY + 5);
                 }
 
                 const pageCount = doc.internal.getNumberOfPages();
+                const generationTimestamp = new Date();
                 for (let i = 1; i <= pageCount; i++) {
                     doc.setPage(i);
                     doc.setFontSize(8);
                     doc.setFont('Helvetica', 'normal');
                     doc.setTextColor('#4b5563');
+                    doc.text(`Generated on: ${generationTimestamp.toLocaleDateString('en-GB')} at ${generationTimestamp.toLocaleTimeString()}`, margin, pageHeight - 10);
                     doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - margin, pageHeight - 10, { align: 'right' });
                 }
 
