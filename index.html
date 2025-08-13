@@ -563,9 +563,18 @@
                         }
                     }
 
-                    badge.addEventListener('click', () => {
-                        badge.dataset.selected = badge.dataset.selected === 'true' ? 'false' : 'true';
-                        updateBadgeStyle(badge);
+                    badge.addEventListener('click', (e) => {
+                        if (e.altKey) {
+                            const allBadges = splitAmongDiv.querySelectorAll('span');
+                            allBadges.forEach(b => {
+                                b.dataset.selected = 'false';
+                            });
+                            badge.dataset.selected = 'true';
+                            allBadges.forEach(b => updateBadgeStyle(b));
+                        } else {
+                            badge.dataset.selected = badge.dataset.selected === 'true' ? 'false' : 'true';
+                            updateBadgeStyle(badge);
+                        }
                     });
 
                     updateBadgeStyle(badge);
@@ -793,9 +802,18 @@
                         }
                     }
                     
-                    badge.addEventListener('click', () => {
-                        badge.dataset.selected = badge.dataset.selected === 'true' ? 'false' : 'true';
-                        updateBadgeStyle(badge);
+                    badge.addEventListener('click', (e) => {
+                        if (e.altKey) {
+                            const allBadges = editSplitAmongDiv.querySelectorAll('span');
+                            allBadges.forEach(b => {
+                                b.dataset.selected = 'false';
+                            });
+                            badge.dataset.selected = 'true';
+                            allBadges.forEach(b => updateBadgeStyle(b));
+                        } else {
+                            badge.dataset.selected = badge.dataset.selected === 'true' ? 'false' : 'true';
+                            updateBadgeStyle(badge);
+                        }
                     });
 
                     updateBadgeStyle(badge);
