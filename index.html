@@ -220,7 +220,7 @@
         <div class="mb-8 space-y-4">
             <div>
                 <label for="tourNameInput" class="block text-sm font-medium text-gray-900 mb-2">Tour/Travel Name</label>
-                <input type="text" id="tourNameInput" placeholder="e.g., Dwarka, Somnath Trip 2023" class="block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <input type="text" id="tourNameInput" placeholder="e.g., Dwarka, Somnath Trip 2025" class="block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
             </div>
             <div>
                 <label for="tripStartDate" class="block text-sm font-medium text-gray-900 mb-2">Trip Dates</label>
@@ -253,7 +253,7 @@
                 <form id="expenseForm" class="space-y-4">
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-900">Description</label>
-                        <input type="text" id="description" placeholder="e.g., Train, Stay, Auto fare" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <input type="text" id="description" placeholder="e.g., Train, Lunch, Dinner, Auto fare" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
                     </div>
                     <div>
                         <label for="amount" class="block text-sm font-medium text-gray-900">Amount (₹)</label>
@@ -314,15 +314,12 @@
         
         <div class="mt-10">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">Data Management</h2>
-            <div class="card p-6 rounded-xl flex flex-wrap gap-4">
+            <div class="card p-6 rounded-xl flex flex-col sm:flex-row gap-4">
                 <button id="exportDataBtn" class="flex-1 text-white py-2 px-4 rounded-lg font-semibold shadow-lg transition-colors duration-300 transform hover:scale-105 bg-gray-700 dark:bg-gray-700">
                     Export Data (JSON)
                 </button>
                 <button id="importDataBtn" class="flex-1 text-white py-2 px-4 rounded-lg font-semibold shadow-lg transition-colors duration-300 transform hover:scale-105 bg-gray-700 dark:bg-gray-700">
                     Import Data (JSON)
-                </button>
-                <button id="clearRecordsBtn" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold shadow-lg hover:bg-red-700 transition-colors duration-300 transform hover:scale-105">
-                    Clear All Records
                 </button>
                 <input type="file" id="fileInput" accept="application/json" class="hidden">
             </div>
@@ -469,7 +466,6 @@
             const exportDataBtn = document.getElementById('exportDataBtn');
             const importDataBtn = document.getElementById('importDataBtn');
             const fileInput = document.getElementById('fileInput');
-            const clearRecordsBtn = document.getElementById('clearRecordsBtn');
             const toastContainer = document.getElementById('toast-container');
             const toastMessage = document.getElementById('toast-message');
             const themeToggleBtn = document.getElementById('themeToggle');
@@ -968,8 +964,33 @@
 
                 const pageCount = doc.internal.getNumberOfPages();
                 const generationTimestamp = new Date();
+
                 for (let i = 1; i <= pageCount; i++) {
                     doc.setPage(i);
+                    
+                    // Add watermark
+                    const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+                    
+                    doc.saveGraphicsState(); // Save the current state before transformations
+                    
+                    doc.setFont('Helvetica', 'bold');
+                    doc.setFontSize(60);
+                    doc.setTextColor(150);
+                    
+                    const GState = window.jspdf.GState;
+                    doc.setGState(new GState({opacity: 0.07}));
+                    
+                    // Translate to the center, rotate, and then draw the text at the new origin (0,0)
+                    doc.text('JAY DWARKADHISH', pageWidth / 1.6, pageHeight / 3.5, {
+                        align: 'center',
+                        baseline: 'middle',
+                        angle: -45
+                    });
+                    
+                    doc.restoreGraphicsState(); // Restore the state so the footer is not rotated
+
+                    // Add footer
                     doc.setFontSize(8);
                     doc.setFont('Helvetica', 'normal');
                     doc.setTextColor('#4b5563');
@@ -1146,26 +1167,6 @@
 
             importDataBtn.addEventListener('click', () => {
                 fileInput.click();
-            });
-
-            clearRecordsBtn.addEventListener('click', () => {
-                showConfirm(
-                    "Clear All Records",
-                    "Are you sure you want to delete all tour info, people, and expenses? This action cannot be undone.",
-                    () => {
-                        tourName = 'Expense Splitter';
-                        tripStartDate = '';
-                        tripEndDate = '';
-                        people.length = 0;
-                        people.push('Harshad', 'Nilesh', 'Bharat', 'Bhavik');
-                        expenses.length = 0;
-
-                        saveData();
-                        renderAll();
-
-                        showAlert("Success", "All records have been cleared.");
-                    }
-                );
             });
 
             fileInput.addEventListener('change', (e) => {
