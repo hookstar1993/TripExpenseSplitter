@@ -321,6 +321,9 @@
                 <button id="importDataBtn" class="flex-1 text-white py-2 px-4 rounded-lg font-semibold shadow-lg transition-colors duration-300 transform hover:scale-105 bg-gray-700 dark:bg-gray-700">
                     Import Data (JSON)
                 </button>
+                <button id="clearRecordsBtn" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold shadow-lg hover:bg-red-700 transition-colors duration-300 transform hover:scale-105">
+                    Clear All Records
+                </button>
                 <input type="file" id="fileInput" accept="application/json" class="hidden">
             </div>
         </div>
@@ -466,6 +469,7 @@
             const exportDataBtn = document.getElementById('exportDataBtn');
             const importDataBtn = document.getElementById('importDataBtn');
             const fileInput = document.getElementById('fileInput');
+            const clearRecordsBtn = document.getElementById('clearRecordsBtn');
             const toastContainer = document.getElementById('toast-container');
             const toastMessage = document.getElementById('toast-message');
             const themeToggleBtn = document.getElementById('themeToggle');
@@ -981,7 +985,6 @@
                     const GState = window.jspdf.GState;
                     doc.setGState(new GState({opacity: 0.07}));
                     
-                    // Translate to the center, rotate, and then draw the text at the new origin (0,0)
                     doc.text('JAY DWARKADHISH', pageWidth / 1.6, pageHeight / 3.5, {
                         align: 'center',
                         baseline: 'middle',
@@ -1167,6 +1170,26 @@
 
             importDataBtn.addEventListener('click', () => {
                 fileInput.click();
+            });
+
+            clearRecordsBtn.addEventListener('click', () => {
+                showConfirm(
+                    "Clear All Records",
+                    "Are you sure you want to delete all tour info, people, and expenses? This action cannot be undone.",
+                    () => {
+                        tourName = 'Expense Splitter';
+                        tripStartDate = '';
+                        tripEndDate = '';
+                        people.length = 0;
+                        people.push('Harshad', 'Nilesh', 'Bharat', 'Bhavik');
+                        expenses.length = 0;
+
+                        saveData();
+                        renderAll();
+
+                        showAlert("Success", "All records have been cleared.");
+                    }
+                );
             });
 
             fileInput.addEventListener('change', (e) => {
