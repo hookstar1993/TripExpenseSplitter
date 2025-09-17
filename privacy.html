@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Expense Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css"> <style>
+        /* Copied styles for background and theme from index.html */
+        body{font-family:'Inter',sans-serif;background-attachment:fixed;transition:all .3s ease;position:relative}body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:radial-gradient(circle at 20% 20%,rgba(128,0,128,.3),transparent 40%),radial-gradient(circle at 80% 30%,rgba(0,0,255,.3),transparent 40%),radial-gradient(circle at 30% 80%,rgba(255,105,180,.3),transparent 40%),radial-gradient(circle at 70% 70%,rgba(0,255,255,.3),transparent 40%);background-size:200% 200%;animation:moveDots 25s linear infinite;transition:opacity .5s ease}
+        @keyframes moveDots{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
+        body{background-color:#f3f4f6;color:#1f2937}body.light::before{opacity:.4}.main-container{background-color:white;border:1px solid #e5e7eb;color:#1f2937}
+        body.dark{background-color:#111827;color:#d1d5db}body.dark::before{opacity:1}body.dark .main-container{backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);background-color:rgba(31,41,55,.5);border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px 0 rgba(0,0,0,.2);color:#d1d5db}
+        body.dark .text-gray-900{color:#d1d5db}body.dark .text-gray-700{color:#d1d5db}
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto main-container p-6 sm:p-8 rounded-2xl shadow-xl">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Privacy Policy</h1>
+            <a href="index.html" class="text-blue-500 hover:underline">← Back to App</a>
+        </div>
+        
+        <div class="prose dark:prose-invert max-w-none text-gray-700 space-y-4">
+            <p><strong>Last Updated:</strong> 17 September 2025</p>
+            <p>Your privacy is critically important to us. This Privacy Policy document outlines the types of information that is handled by our Expense Splitter tool and how it is used.</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-6">1. No Data Collection</h2>
+            <p>Our Expense Splitter tool is a purely client-side application. This means all the code runs directly in your web browser. We do not have a server, a database, or any backend infrastructure. **We do not collect, store, or transmit any of your personal data.**</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-6">2. Local Storage Usage</h2>
+            <p>To provide a persistent experience, the tool uses your browser's `localStorage` feature. This allows the data you enter—such as tour names, participant names, and expense details—to be saved directly on your own computer. This data remains in your browser and is not sent to us or any third party.</p>
+            <p>You have full control over this data. You can clear it at any time by using the "Clear All Records" button within the application or by clearing your browser's cache and site data for this page.</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-6">3. Data Security</h2>
+            <p>Since all data is stored locally on your device, the security of that data is your responsibility. We recommend using a secure computer and browser to protect your information.</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-6">4. Import/Export Functionality</h2>
+            <p>The "Import Data" and "Export Data" features are designed to help you back up and restore your expense data. When you export data, a JSON file is created and saved to your local device. When you import, the tool reads a JSON file from your local device. At no point is this data transmitted over the internet to our servers.</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-6">5. Changes to This Privacy Policy</h2>
+            <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-6">Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy, you can contact us. However, please note that since we do not store your data, we cannot assist with data recovery or access requests.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Simple theme-applier script
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+        } else {
+            document.body.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>
