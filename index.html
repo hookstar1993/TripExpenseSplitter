@@ -294,6 +294,14 @@
     </nav>
 
     <div class="max-w-4xl mx-auto main-container p-6 sm:p-8 rounded-2xl shadow-xl">
+        <div class="text-center mb-8">
+        <br>
+        <br>
+        <br>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Welcome to Trip Expense Splitter</h1>
+        </div>
+        <br>
+        <br>
         <div class="mb-8 space-y-4">
             <div>
                 <label for="tourNameInput" class="block text-sm font-medium text-gray-900 mb-2">Tour/Travel Name</label>
@@ -686,7 +694,7 @@
                     
                     badge.addEventListener('click', (e) => {
                         const personName = person;
-                        if (e.ctrlKey) { // Ctrl key for multi-select
+                        if (e.ctrlKey || e.metaKey) { // Ctrl key for multi-select (Cmd on Mac)
                             const index = selectedPeopleForRemoval.indexOf(personName);
                             if (index > -1) {
                                 selectedPeopleForRemoval.splice(index, 1); // Deselect
