@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report an Issue - Expense Tracker</title>
+    <title>Report an Issue - Trip Expense Splitter</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -19,17 +19,36 @@
         .switch{position:relative;display:inline-block;width:60px;height:34px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#4b5563;transition:.4s;border-radius:34px}.slider:before{position:absolute;content:"";height:26px;width:26px;left:4px;bottom:4px;background-color:white;transition:.4s;border-radius:50%}input:checked+.slider{background-color:#2196F3}input:checked+.slider:before{transform:translateX(26px)}
     </style>
 </head>
-<body class="p-4 sm:p-8 pb-24">
+<body class="p-4 sm:p-8 pb-24 pt-24">
 
-    <div class="max-w-4xl mx-auto main-container p-6 sm:p-8 rounded-2xl shadow-xl">
-        <div class="flex flex-wrap justify-between items-center mb-6 gap-y-2">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Report an Issue</h1>
-            <div class="text-xs sm:text-sm space-x-2 sm:space-x-4 whitespace-nowrap">
-                <a href="index.html" class="text-blue-500 hover:underline">Home</a>
-                <a href="privacy.html" class="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">Privacy</a>
-                <a href="terms.html" class="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">Terms</a>
-                <a href="misuse.html" class="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">Acceptable Use</a>
+    <!-- Fixed Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/30 dark:bg-black/30 border-b border-gray-200 dark:border-white/10 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="font-bold text-xl text-gray-900 dark:text-white">Trip Expense Splitter</a>
+                </div>
+                <!-- Desktop Menu -->
+                <div class="hidden sm:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="contact.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                        <a href="report.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Report Issue</a>
+                        <a href="terms.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Terms</a>
+                        <a href="privacy.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Privacy</a>
+                        <a href="misuse.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Acceptable Use</a>
+                    </div>
+                </div>
+                 <div class="sm:hidden">
+                    <!-- A hamburger icon could go here for a mobile menu -->
+                </div>
             </div>
+        </div>
+    </nav>
+<br>
+<br>
+    <div class="max-w-4xl mx-auto main-container p-6 sm:p-8 rounded-2xl shadow-xl">
+        <div class="mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Report an Issue</h1>
         </div>
         
         <div class="text-gray-700 space-y-4">
