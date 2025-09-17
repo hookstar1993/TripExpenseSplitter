@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker & Splitter</title>
+    <title>Trip Expense Splitter</title>
     <!-- Inter font from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -267,13 +267,33 @@
 
     </style>
 </head>
-<body class="p-4 sm:p-8">
+<body class="p-4 sm:p-8 pt-24">
+
+    <!-- Fixed Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/30 dark:bg-black/30 border-b border-gray-200 dark:border-white/10 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="font-bold text-xl text-gray-900 dark:text-white">Trip Expense Splitter</a>
+                </div>
+                <!-- Desktop Menu -->
+                <div class="hidden sm:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="contact.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                        <a href="report.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Report Issue</a>
+                        <a href="terms.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Terms</a>
+                        <a href="privacy.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Privacy</a>
+                        <a href="misuse.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Acceptable Use</a>
+                    </div>
+                </div>
+                 <div class="sm:hidden">
+                    <!-- A hamburger icon could go here for a mobile menu -->
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <div class="max-w-4xl mx-auto main-container p-6 sm:p-8 rounded-2xl shadow-xl">
-        <div class="flex justify-between items-center mb-6">
-            <h1 id="mainTitle" class="text-3xl sm:text-4xl font-bold text-gray-900 text-center flex-grow">Expense Splitter</h1>
-            
-        </div>
         <div class="mb-8 space-y-4">
             <div>
                 <label for="tourNameInput" class="block text-sm font-medium text-gray-900 mb-2">Tour/Travel Name</label>
@@ -486,16 +506,15 @@
 
     <script>
         window.onload = function() {
-            let tourName = localStorage.getItem('tourName') || 'Expense Splitter';
+            let tourName = localStorage.getItem('tourName') || 'Trip Expense Splitter';
             let tripStartDate = localStorage.getItem('tripStartDate') || '';
             let tripEndDate = localStorage.getItem('tripEndDate') || '';
             const people = JSON.parse(localStorage.getItem('people')) || ['Harshad', 'Nilesh', 'Bharat', 'Bhavik'];
             const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-            let selectedPersonForRemoval = null;
+            let selectedPeopleForRemoval = [];
             let originalNameForEdit = null;
             const savedTheme = localStorage.getItem('theme') || 'dark';
 
-            const mainTitle = document.getElementById('mainTitle');
             const tourNameInput = document.getElementById('tourNameInput');
             const tripStartDateInput = document.getElementById('tripStartDate');
             const tripEndDateInput = document.getElementById('tripEndDate');
@@ -597,8 +616,7 @@
             }
 
             function renderTourInfo() {
-                mainTitle.textContent = tourName || 'Expense Splitter';
-                tourNameInput.value = tourName === 'Expense Splitter' ? '' : tourName;
+                tourNameInput.value = tourName === 'Trip Expense Splitter' ? '' : tourName;
                 tripStartDateInput.value = tripStartDate;
                 tripEndDateInput.value = tripEndDate;
             }
@@ -658,15 +676,32 @@
                     badge.textContent = person;
                     badge.className = 'px-3 py-1 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-200';
                     
+                    const isSelected = selectedPeopleForRemoval.includes(person);
+
                     if (document.body.classList.contains('dark')) {
-                        badge.classList.add(person === selectedPersonForRemoval ? 'bg-red-500' : 'bg-gray-700', person === selectedPersonForRemoval ? 'text-white' : 'text-gray-200', person === selectedPersonForRemoval ? 'hover:bg-red-600' : 'hover:bg-gray-600');
+                        badge.classList.add(isSelected ? 'bg-red-500' : 'bg-gray-700', isSelected ? 'text-white' : 'text-gray-200', isSelected ? 'hover:bg-red-600' : 'hover:bg-gray-600');
                     } else {
-                        badge.classList.add(person === selectedPersonForRemoval ? 'bg-red-500' : 'bg-gray-200', person === selectedPersonForRemoval ? 'text-white' : 'text-gray-700', person === selectedPersonForRemoval ? 'hover:bg-red-600' : 'hover:bg-gray-300');
+                        badge.classList.add(isSelected ? 'bg-red-500' : 'bg-gray-200', isSelected ? 'text-white' : 'text-gray-700', isSelected ? 'hover:bg-red-600' : 'hover:bg-gray-300');
                     }
                     
-                    badge.addEventListener('click', () => {
-                         selectedPersonForRemoval = (selectedPersonForRemoval === person) ? null : person;
-                         renderPeopleSelectors();
+                    badge.addEventListener('click', (e) => {
+                        const personName = person;
+                        if (e.ctrlKey) { // Ctrl key for multi-select
+                            const index = selectedPeopleForRemoval.indexOf(personName);
+                            if (index > -1) {
+                                selectedPeopleForRemoval.splice(index, 1); // Deselect
+                            } else {
+                                selectedPeopleForRemoval.push(personName); // Select
+                            }
+                        } else { // Normal click for single select
+                            const wasSelected = selectedPeopleForRemoval.includes(personName);
+                            if (wasSelected && selectedPeopleForRemoval.length === 1) {
+                                selectedPeopleForRemoval = []; // Deselect if it was the only one
+                            } else {
+                                selectedPeopleForRemoval = [personName]; // Select only this one
+                            }
+                        }
+                        renderPeopleSelectors();
                     });
 
                     badge.addEventListener('dblclick', (e) => {
@@ -678,7 +713,7 @@
                     peopleListDiv.appendChild(badge);
                 });
 
-                removePersonBtn.disabled = people.length <= 1 || selectedPersonForRemoval === null;
+                removePersonBtn.disabled = selectedPeopleForRemoval.length === 0;
                 removePersonBtn.classList.toggle('opacity-50', removePersonBtn.disabled);
                 removePersonBtn.classList.toggle('cursor-not-allowed', removePersonBtn.disabled);
             }
@@ -792,7 +827,7 @@
             }
 
             tourNameInput.addEventListener('input', (e) => {
-                tourName = e.target.value || 'Expense Splitter';
+                tourName = e.target.value || 'Trip Expense Splitter';
                 saveData();
                 renderAll();
             });
@@ -1229,29 +1264,39 @@
             });
 
             removePersonBtn.addEventListener('click', () => {
-                if (selectedPersonForRemoval && people.length > 1) {
-                    showConfirm("Remove Person", `Are you sure you want to remove ${selectedPersonForRemoval}? This will also remove them from all existing expenses.`, () => {
-                        const personToRemove = selectedPersonForRemoval;
-                        const index = people.indexOf(personToRemove);
-                        if (index > -1) people.splice(index, 1);
-                        
-                        const updatedExpenses = expenses.filter(expense => {
-                            const paidByRemoved = expense.paidBy === personToRemove;
-                            const splitContainsOnlyRemoved = expense.splitAmong.length === 1 && expense.splitAmong[0] === personToRemove;
-                            return !paidByRemoved && !splitContainsOnlyRemoved;
-                        });
+                if (selectedPeopleForRemoval.length > 0) {
+                    if (selectedPeopleForRemoval.length >= people.length) {
+                        showAlert("Action Denied", "You cannot remove all people. At least one person must remain.");
+                        return;
+                    }
 
-                        updatedExpenses.forEach(expense => {
-                            const splitIndex = expense.splitAmong.indexOf(personToRemove);
-                            if (splitIndex > -1) expense.splitAmong.splice(splitIndex, 1);
-                        });
+                    showConfirm("Remove People", `Are you sure you want to remove ${selectedPeopleForRemoval.join(', ')}? This will also remove them from all related expenses.`, () => {
+                        const peopleToRemoveSet = new Set(selectedPeopleForRemoval);
+
+                        // 1. Filter people list
+                        const updatedPeople = people.filter(p => !peopleToRemoveSet.has(p));
+
+                        // 2. Filter expenses
+                        const updatedExpenses = expenses
+                            .filter(expense => !peopleToRemoveSet.has(expense.paidBy)) // Remove expenses paid by deleted person
+                            .map(expense => {
+                                // Remove deleted people from splitAmong list
+                                expense.splitAmong = expense.splitAmong.filter(p => !peopleToRemoveSet.has(p));
+                                return expense;
+                            })
+                            .filter(expense => expense.splitAmong.length > 0); // Remove expenses that now have no one to split among
+
+                        // 3. Update main arrays
+                        people.length = 0;
+                        people.push(...updatedPeople);
                         
                         expenses.length = 0;
                         expenses.push(...updatedExpenses);
 
-                        selectedPersonForRemoval = null;
+                        selectedPeopleForRemoval = []; // Clear selection
                         saveData();
                         renderAll();
+                        showAlert("Success", "Selected people have been removed.");
                     });
                 }
             });
@@ -1285,7 +1330,7 @@
                     "Clear All Records",
                     "Are you sure you want to delete all tour info, people, and expenses? This action cannot be undone.",
                     () => {
-                        tourName = 'Expense Splitter';
+                        tourName = 'Trip Expense Splitter';
                         tripStartDate = '';
                         tripEndDate = '';
                         people.length = 0;
@@ -1309,7 +1354,7 @@
                         const importedData = JSON.parse(event.target.result);
                         if (importedData.people && importedData.expenses) {
                             showConfirm("Import Data", "Are you sure you want to overwrite your current data with this file?", () => {
-                                tourName = importedData.tourName || 'Expense Splitter';
+                                tourName = importedData.tourName || 'Trip Expense Splitter';
                                 tripStartDate = importedData.tripStartDate || '';
                                 tripEndDate = importedData.tripEndDate || '';
                                 people.length = 0;
@@ -1377,8 +1422,13 @@
         };
     </script>
     <footer class="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-        <p class="mb-1">© 2025 Quick Expense Split Counter. All Rights Reserved.</p>
+        <p class="mb-2">
+            <a href="contact.html" class="text-blue-500 hover:underline">Contact Us</a> | 
+            <a href="report.html" class="text-blue-500 hover:underline">Report an Issue</a>
+        </p>
+        <p class="mb-1">Copyright © 2025 Dwarkvyn. All Rights Reserved.</p>
         <p>Designed with ❤️ in INDIA | <a href="https://www.instagram.com/hookstar.fx" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">HOOK STAR.</a></p>
     </footer>
 </body>
 </html>
+
