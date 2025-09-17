@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker & Splitter</title>
+    <title>Expense Splitter</title>
     <!-- Inter font from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- jsPDF-AutoTable plugin for table generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -88,8 +88,6 @@
 
         /* Dark mode styling */
         body.dark {
-            background-image: linear-gradient(to bottom right, #1f2937, #111827, #0d121c, #1f2937);
-            background-color: transparent;
             background-color: #111827; /* Dark base color */
             color: #d1d5db;
         }
@@ -145,7 +143,7 @@
             border-color: rgba(255, 255, 255, 0.05);
             cursor: not-allowed;
         }
-
+        
         /* Custom scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
@@ -174,7 +172,7 @@
         /* Theme Toggle Button */
         #themeToggle {
             position: fixed;
-            bottom: 1.5rem;
+            bottom: 5rem; /* Adjusted for footer */
             right: 1.5rem;
             z-index: 50;
             padding: 0.5rem;
@@ -196,7 +194,7 @@
         body.dark #themeToggle:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-
+        
         /* Slider Styling */
         .switch {
             position: relative;
@@ -237,7 +235,7 @@
         input:checked + .slider:before {
             transform: translateX(26px);
         }
-
+        
         .light-mode-icon { color: #facc15; }
         .dark-mode-icon { color: #60a5fa; }
 
@@ -269,12 +267,16 @@
 
     </style>
 </head>
-<body class="p-4 sm:p-8">
+<body class="p-4 sm:p-8 pb-24"> <!-- Added padding-bottom for footer -->
 
     <div class="max-w-4xl mx-auto main-container p-6 sm:p-8 rounded-2xl shadow-xl">
-        <div class="flex justify-between items-center mb-6">
-            <h1 id="mainTitle" class="text-3xl sm:text-4xl font-bold text-gray-900 text-center flex-grow">Expense Splitter</h1>
-
+        <div class="flex flex-wrap justify-between items-center mb-6 gap-y-2">
+             <a href="index.html" class="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">Home</a>
+            <div class="text-xs sm:text-sm space-x-2 sm:space-x-4 whitespace-nowrap">
+                <a href="privacy.html" class="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">Privacy</a>
+                <a href="terms.html" class="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">Terms</a>
+                <a href="misuse.html" class="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">Acceptable Use</a>
+            </div>
         </div>
         <div class="mb-8 space-y-4">
             <div>
@@ -284,8 +286,6 @@
             <div>
                 <label for="tripStartDate" class="block text-sm font-medium text-gray-900 mb-2">Trip Dates</label>
                 <div class="flex flex-wrap gap-4">
-                    <input type="date" id="tripStartDate" required class="flex-1 min-w-[120px] block px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                    <input type="date" id="tripEndDate" required class="flex-1 min-w-[120px] block px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
                     <input type="date" id="tripStartDate" required class="flex-1 min-w-[120px] block px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors ios-date-picker">
                     <input type="date" id="tripEndDate" required class="flex-1 min-w-[120px] block px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors ios-date-picker">
                 </div>
@@ -322,7 +322,6 @@
                     </div>
                     <div>
                         <label for="dateInput" class="block text-sm font-medium text-gray-900">Date</label>
-                        <input type="date" id="dateInput" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
                         <input type="date" id="dateInput" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors ios-date-picker">
                     </div>
                     <div>
@@ -373,7 +372,7 @@
                 <p id="noExpensesMessage" class="text-center text-gray-400 py-6 px-4">No expenses added yet.</p>
             </div>
         </div>
-
+        
         <div class="mt-10">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">Data Management</h2>
             <div class="card p-6 rounded-xl flex flex-col sm:flex-row gap-4">
@@ -407,7 +406,6 @@
                 </div>
                 <div>
                     <label for="editExpenseDate" class="block text-sm font-medium text-gray-900">Date</label>
-                    <input type="date" id="editExpenseDate" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
                     <input type="date" id="editExpenseDate" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors ios-date-picker">
                 </div>
                 <div>
@@ -425,22 +423,7 @@
             </form>
         </div>
     </div>
-
-    <!-- Theme Toggle Button -->
-    <div id="themeToggle" class="fixed bottom-5 right-5 z-50 p-2 rounded-full cursor-pointer bg-white/30 dark:bg-black/30 backdrop-blur-md transition-all duration-500 flex items-center justify-center space-x-2">
-        <svg id="sunIcon" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-        <label class="switch">
-            <input type="checkbox" id="theme-checkbox">
-            <span class="slider"></span>
-        </label>
-        <svg id="moonIcon" class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-        </svg>
-    </div>
-
-    <!-- Loading Modal -->
+    
     <div id="loadingModal" class="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center hidden">
         <div class="main-container p-8 rounded-xl shadow-2xl max-w-xs w-full mx-4 text-center">
             <div class="flex justify-center items-center mb-4">
@@ -465,7 +448,7 @@
             </div>
         </div>
     </div>
-
+    
     <div id="editPersonModal" class="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center hidden">
         <div class="main-container p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4 transform transition-transform duration-300 scale-95 opacity-0" id="editPersonModalContent">
             <h3 class="text-xl font-bold text-gray-900 mb-4">Edit Person's Name</h3>
@@ -485,14 +468,27 @@
             </div>
         </div>
     </div>
-
+    
     <div id="toast-container" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-300 opacity-0">
         <div id="toast-message" class="bg-green-600 text-white text-sm px-6 py-3 rounded-full shadow-lg"></div>
+    </div>
+    
+    <div id="themeToggle" class="fixed bottom-5 right-5 z-50 p-2 rounded-full cursor-pointer bg-white/30 dark:bg-black/30 backdrop-blur-md transition-all duration-500 flex items-center justify-center space-x-2">
+        <svg id="sunIcon" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <label class="switch">
+            <input type="checkbox" id="theme-checkbox">
+            <span class="slider"></span>
+        </label>
+        <svg id="moonIcon" class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
     </div>
 
     <script>
         window.onload = function() {
-            let tourName = localStorage.getItem('tourName') || 'Expense Splitter';
+            let tourName = localStorage.getItem('tourName') || '';
             let tripStartDate = localStorage.getItem('tripStartDate') || '';
             let tripEndDate = localStorage.getItem('tripEndDate') || '';
             const people = JSON.parse(localStorage.getItem('people')) || ['Harshad', 'Nilesh', 'Bharat', 'Bhavik'];
@@ -501,7 +497,6 @@
             let originalNameForEdit = null;
             const savedTheme = localStorage.getItem('theme') || 'dark';
 
-            const mainTitle = document.getElementById('mainTitle');
             const tourNameInput = document.getElementById('tourNameInput');
             const tripStartDateInput = document.getElementById('tripStartDate');
             const tripEndDateInput = document.getElementById('tripEndDate');
@@ -516,7 +511,6 @@
             const noExpensesMessage = document.getElementById('noExpensesMessage');
             const generatePdfBtn = document.getElementById('generatePdfBtn');
             const addPersonModal = document.getElementById('addPersonModal');
-            const addPersonModalContent = document.getElementById('addPersonModalContent');
             const personInput = document.getElementById('personInput');
             const addPersonBtn = document.getElementById('addPersonBtn');
             const removePersonBtn = document.getElementById('removePersonBtn');
@@ -524,7 +518,6 @@
             const cancelAddPersonBtn = document.getElementById('cancelAddPersonBtn');
             const confirmAddPersonBtn = document.getElementById('confirmAddPersonBtn');
             const editExpenseModal = document.getElementById('editExpenseModal');
-            const editExpenseModalContent = document.getElementById('editExpenseModalContent');
             const editExpenseDescription = document.getElementById('editExpenseDescription');
             const editExpenseAmount = document.getElementById('editExpenseAmount');
             const editExpenseDate = document.getElementById('editExpenseDate');
@@ -533,12 +526,10 @@
             const cancelEditExpenseBtn = document.getElementById('cancelEditExpenseBtn');
             const saveEditedExpenseBtn = document.getElementById('saveEditedExpenseBtn');
             const editPersonModal = document.getElementById('editPersonModal');
-            const editPersonModalContent = document.getElementById('editPersonModalContent');
             const editPersonInput = document.getElementById('editPersonInput');
             const cancelEditPersonBtn = document.getElementById('cancelEditPersonBtn');
             const confirmEditPersonBtn = document.getElementById('confirmEditPersonBtn');
             const customModal = document.getElementById('customModal');
-            const customModalContent = document.getElementById('customModalContent');
             const modalTitle = document.getElementById('modalTitle');
             const modalMessage = document.getElementById('modalMessage');
             const modalButtons = document.getElementById('modalButtons');
@@ -548,13 +539,9 @@
             const clearRecordsBtn = document.getElementById('clearRecordsBtn');
             const toastContainer = document.getElementById('toast-container');
             const toastMessage = document.getElementById('toast-message');
-            const themeToggleBtn = document.getElementById('themeToggle');
             const themeCheckbox = document.getElementById('theme-checkbox');
             const moonIcon = document.getElementById('moonIcon');
             const sunIcon = document.getElementById('sunIcon');
-            const donationsBtn = document.getElementById('donations-btn');
-            const donationsModal = document.getElementById('donations-modal');
-            const closeDonationsBtn = donationsModal ? donationsModal.querySelector('.close-modal-btn') : null;
             const loadingModal = document.getElementById('loadingModal');
             const { jsPDF } = window.jspdf;
 
@@ -575,7 +562,7 @@
                     }
                 }
             }
-
+            
             if (themeCheckbox) {
                 themeCheckbox.addEventListener('change', () => {
                     const newTheme = themeCheckbox.checked ? 'dark' : 'light';
@@ -593,18 +580,16 @@
                 localStorage.setItem('expenses', JSON.stringify(expenses));
             }
 
-            // Function to format date from YYYY-MM-DD to DD/MM/YYYY
             function formatDate(isoDate) {
                 if (!isoDate || typeof isoDate !== 'string') return '';
                 const parts = isoDate.split('-');
-                if (parts.length !== 3) return isoDate; // Return original if not in expected format
+                if (parts.length !== 3) return isoDate;
                 const [year, month, day] = parts;
                 return `${day}/${month}/${year}`;
             }
 
             function renderTourInfo() {
-                mainTitle.textContent = tourName || 'Expense Splitter';
-                tourNameInput.value = tourName === 'Expense Splitter' ? '' : tourName;
+                tourNameInput.value = tourName;
                 tripStartDateInput.value = tripStartDate;
                 tripEndDateInput.value = tripEndDate;
             }
@@ -624,13 +609,13 @@
                     badge.textContent = person;
                     badge.dataset.name = person;
                     badge.classList.add('px-3', 'py-1', 'rounded-full', 'text-sm', 'font-semibold', 'cursor-pointer', 'transition-colors', 'duration-200');
-
+                    
                     badge.dataset.selected = 'true';
 
                     function updateBadgeStyle(b) {
                         const isSelected = b.dataset.selected === 'true';
                         const isDark = document.body.classList.contains('dark');
-
+                        
                         b.className = 'px-3 py-1 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-200';
 
                         if (isSelected) {
@@ -663,13 +648,13 @@
                     const badge = document.createElement('span');
                     badge.textContent = person;
                     badge.className = 'px-3 py-1 rounded-full text-sm font-semibold cursor-pointer transition-colors duration-200';
-
+                    
                     if (document.body.classList.contains('dark')) {
                         badge.classList.add(person === selectedPersonForRemoval ? 'bg-red-500' : 'bg-gray-700', person === selectedPersonForRemoval ? 'text-white' : 'text-gray-200', person === selectedPersonForRemoval ? 'hover:bg-red-600' : 'hover:bg-gray-600');
                     } else {
                         badge.classList.add(person === selectedPersonForRemoval ? 'bg-red-500' : 'bg-gray-200', person === selectedPersonForRemoval ? 'text-white' : 'text-gray-700', person === selectedPersonForRemoval ? 'hover:bg-red-600' : 'hover:bg-gray-300');
                     }
-
+                    
                     badge.addEventListener('click', () => {
                          selectedPersonForRemoval = (selectedPersonForRemoval === person) ? null : person;
                          renderPeopleSelectors();
@@ -680,7 +665,7 @@
                           editPersonInput.value = person;
                           showModal('editPersonModal');
                     });
-
+                    
                     peopleListDiv.appendChild(badge);
                 });
 
@@ -701,9 +686,9 @@
                     const individualShare = expense.splitAmong.length > 0 ? expense.amount / expense.splitAmong.length : 0;
                     const row = document.createElement('tr');
                     row.className = 'bg-transparent';
-
+                    
                     row.classList.add(document.body.classList.contains('dark') ? 'hover:bg-gray-800/20' : 'hover:bg-gray-100');
-
+                    
                     row.innerHTML = `
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${expense.description}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${formatDate(expense.date)}</td>
@@ -727,7 +712,7 @@
                 }
 
                 const summaryHtml = [];
-
+                
                 const totalPaid = {};
                 const personBalances = {};
                 people.forEach(person => {
@@ -784,7 +769,7 @@
                     if (debtor.amount <= 0.01) debtorIndex++;
                     if (creditor.amount <= 0.01) creditorIndex++;
                 }
-
+                
                 summaryHtml.push('<h3 class="text-lg font-semibold text-gray-900">Final Settlements:</h3>');
                 if (settlements.length > 0) {
                     summaryHtml.push(`<ul class="list-disc list-inside space-y-1 text-gray-900">`);
@@ -798,29 +783,26 @@
             }
 
             tourNameInput.addEventListener('input', (e) => {
-                tourName = e.target.value || 'Expense Splitter';
+                tourName = e.target.value;
                 saveData();
-                renderAll();
             });
             tripStartDateInput.addEventListener('input', (e) => {
                 tripStartDate = e.target.value;
                 saveData();
-                renderAll();
             });
             tripEndDateInput.addEventListener('input', (e) => {
                 tripEndDate = e.target.value;
                 saveData();
-                renderAll();
             });
 
             expenseForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const description = descriptionInput.value;
                 const amount = parseFloat(amountInput.value);
-                const date = dateInput.value; // Stored as YYYY-MM-DD
+                const date = dateInput.value;
                 const paidBy = paidBySelect.value;
                 const splitAmong = Array.from(splitAmongDiv.querySelectorAll('span[data-selected="true"]')).map(badge => badge.dataset.name);
-
+                
                 if (splitAmong.length === 0) {
                     showAlert("Validation Error", "Please select at least one person to split the expense with.");
                     return;
@@ -828,7 +810,7 @@
 
                 expenses.push({ description, date, amount, paidBy, splitAmong });
                 saveData();
-
+                
                 expenseForm.reset();
                 setTodayDate();
                 renderAll(); 
@@ -845,9 +827,9 @@
 
             window.editExpense = (index) => {
                 const expense = expenses[index];
-                document.getElementById('editExpenseDescription').value = expense.description;
-                document.getElementById('editExpenseAmount').value = expense.amount;
-                document.getElementById('editExpenseDate').value = expense.date; // Input requires YYYY-MM-DD
+                editExpenseDescription.value = expense.description;
+                editExpenseAmount.value = expense.amount;
+                editExpenseDate.value = expense.date;
                 const editPaidBySelect = document.getElementById('editExpensePaidBy');
                 editPaidBySelect.innerHTML = '';
                 people.forEach(person => {
@@ -865,7 +847,7 @@
                     badge.textContent = person;
                     badge.dataset.name = person;
                     badge.classList.add('px-3', 'py-1', 'rounded-full', 'text-sm', 'font-semibold', 'cursor-pointer', 'transition-colors', 'duration-200');
-
+                    
                     badge.dataset.selected = expense.splitAmong.includes(person) ? 'true' : 'false';
 
                     function updateBadgeStyle(b) {
@@ -878,7 +860,7 @@
                             b.classList.add(...(isDark ? ['bg-gray-700', 'text-gray-200', 'hover:bg-gray-600'] : ['bg-gray-200', 'text-gray-700', 'hover:bg-gray-300']));
                         }
                     }
-
+                    
                     badge.addEventListener('click', (e) => {
                         if (e.altKey) {
                             const allBadges = editSplitAmongDiv.querySelectorAll('span');
@@ -903,9 +885,9 @@
             };
 
             function saveEditedExpense(index) {
-                const description = document.getElementById('editExpenseDescription').value;
-                const amount = parseFloat(document.getElementById('editExpenseAmount').value);
-                const date = document.getElementById('editExpenseDate').value; // Stored as YYYY-MM-DD
+                const description = editExpenseDescription.value;
+                const amount = parseFloat(editExpenseAmount.value);
+                const date = editExpenseDate.value;
                 const paidBy = document.getElementById('editExpensePaidBy').value;
                 const splitAmong = Array.from(document.querySelectorAll('#editSplitAmong span[data-selected="true"]')).map(badge => badge.dataset.name);
 
@@ -913,7 +895,7 @@
                     showAlert("Validation Error", "Please select at least one person to split the expense with.");
                     return;
                 }
-
+                
                 expenses[index] = { description, amount, date, paidBy, splitAmong };
                 saveData();
                 renderAll();
@@ -929,68 +911,8 @@
             }
 
             generatePdfBtn.addEventListener('click', () => {
-                const doc = new jsPDF();
-                
-                const margin = 15;
-                const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-                let y = margin;
-                
-                const currentTourName = (tourName || 'Expense Report').toUpperCase();
-                
-                doc.setFont('Helvetica', 'bold');
-                doc.setFontSize(22);
-                doc.setTextColor('#1f2937');
-                doc.text(currentTourName, doc.internal.pageSize.width / 2, y, { align: 'center' });
-                y += 8;
-
-                if (tripStartDate && tripEndDate) {
-                    doc.setFontSize(10);
-                    doc.setFont('Helvetica', 'normal');
-                    doc.setTextColor('#4b5563');
-                    doc.text(`Trip Dates: ${formatDate(tripStartDate)} to ${formatDate(tripEndDate)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
-                } else if (tripStartDate) {
-                    doc.setFontSize(10);
-                    doc.setFont('Helvetica', 'normal');
-                    doc.setTextColor('#4b5563');
-                    doc.text(`Trip Starts: ${formatDate(tripStartDate)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
-                }
-                y += 12;
-
-                doc.autoTable({
-                    head: [['Expenses List']],
-                    body: [],
-                    startY: y,
-                    theme: 'plain',
-                    headStyles: { fontStyle: 'bold', fontSize: 12, textColor: '#1f2937' },
-                    margin: { left: margin }
-                });
                 showLoadingModal();
 
-                const expenseHeaders = [['Description', 'Date', 'Amount', 'Paid By', 'Split Amount', 'Split Among']];
-                const expenseData = expenses.map(e => [
-                    e.description,
-                    formatDate(e.date),
-                    `Rs. ${e.amount.toFixed(2)}`,
-                    e.paidBy,
-                    `Rs. ${(e.splitAmong.length > 0 ? e.amount / e.splitAmong.length : 0).toFixed(2)}`,
-                    e.splitAmong.join(', ')
-                ]);
-
-                doc.autoTable({
-                    startY: doc.autoTable.previous.finalY,
-                    head: expenseHeaders, 
-                    body: expenseData,
-                    styles: { font: 'Helvetica', cellPadding: 2, fontSize: 8, valign: 'middle' },
-                    headStyles: { fillColor: [243, 244, 246], textColor: [55, 65, 81], fontStyle: 'bold' },
-                    bodyStyles: { textColor: [55, 65, 81] },
-                    margin: { left: margin, right: margin },
-                });
-                
-                const totalPaid = {}, personBalances = {};
-                people.forEach(person => {
-                    totalPaid[person] = 0;
-                    personBalances[person] = 0;
-                });
                 setTimeout(() => {
                     try {
                         const doc = new jsPDF();
@@ -999,7 +921,7 @@
                         const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
                         let y = margin;
                         
-                        const currentTourName = (tourName || 'Expense Report').toUpperCase();
+                        const currentTourName = (tourNameInput.value || 'Expense Report').toUpperCase();
                         
                         doc.setFont('Helvetica', 'bold');
                         doc.setFontSize(22);
@@ -1007,16 +929,16 @@
                         doc.text(currentTourName, doc.internal.pageSize.width / 2, y, { align: 'center' });
                         y += 8;
 
-                        if (tripStartDate && tripEndDate) {
+                        if (tripStartDateInput.value && tripEndDateInput.value) {
                             doc.setFontSize(10);
                             doc.setFont('Helvetica', 'normal');
                             doc.setTextColor('#4b5563');
-                            doc.text(`Trip Dates: ${formatDate(tripStartDate)} to ${formatDate(tripEndDate)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
-                        } else if (tripStartDate) {
+                            doc.text(`Trip Dates: ${formatDate(tripStartDateInput.value)} to ${formatDate(tripEndDateInput.value)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
+                        } else if (tripStartDateInput.value) {
                             doc.setFontSize(10);
                             doc.setFont('Helvetica', 'normal');
                             doc.setTextColor('#4b5563');
-                            doc.text(`Trip Starts: ${formatDate(tripStartDate)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
+                            doc.text(`Trip Starts: ${formatDate(tripStartDateInput.value)}`, doc.internal.pageSize.width / 2, y, { align: 'center' });
                         }
                         y += 12;
 
@@ -1029,14 +951,6 @@
                             margin: { left: margin }
                         });
 
-                expenses.forEach(expense => {
-                    totalPaid[expense.paidBy] += expense.amount;
-                    if (expense.splitAmong.length > 0) {
-                        const individualShare = expense.amount / expense.splitAmong.length;
-                        expense.splitAmong.forEach(person => {
-                            if(personBalances.hasOwnProperty(person)) {
-                                personBalances[person] -= individualShare;
-                            }
                         const expenseHeaders = [['Description', 'Date', 'Amount', 'Paid By', 'Split Amount', 'Split Among']];
                         const expenseData = expenses.map(e => [
                             e.description,
@@ -1062,32 +976,7 @@
                             totalPaid[person] = 0;
                             personBalances[person] = 0;
                         });
-                    }
-                    if(personBalances.hasOwnProperty(expense.paidBy)){
-                        personBalances[expense.paidBy] += expense.amount;
-                    }
-                });
 
-                const peopleWhoPaid = people.filter(p => totalPaid[p] > 0);
-                if (peopleWhoPaid.length > 0) {
-                    doc.autoTable({
-                        head: [['Total Paid by Each Person']],
-                        body: [],
-                        startY: doc.autoTable.previous.finalY + 10,
-                        theme: 'plain',
-                        headStyles: { fontStyle: 'bold', fontSize: 12, textColor: '#1f2937' },
-                        margin: { left: margin }
-                    });
-                    doc.autoTable({ 
-                        startY: doc.autoTable.previous.finalY, 
-                        head: [['Person', 'Amount Paid']], 
-                        body: peopleWhoPaid.map(p => [p, `Rs. ${totalPaid[p].toFixed(2)}`]), 
-                        styles: { font: 'Helvetica', cellPadding: 2, fontSize: 10 }, 
-                        headStyles: { fillColor: [243, 244, 246], textColor: [55, 65, 81], fontStyle: 'bold' }, 
-                        bodyStyles: { textColor: [55, 65, 81] }, 
-                        margin: { left: margin, right: margin } 
-                    });
-                }
                         expenses.forEach(expense => {
                             totalPaid[expense.paidBy] += expense.amount;
                             if (expense.splitAmong.length > 0) {
@@ -1103,11 +992,6 @@
                             }
                         });
 
-                const debtors = [], creditors = [];
-                for (const person in personBalances) {
-                    if (personBalances[person] < -0.01) debtors.push({ person, amount: Math.abs(personBalances[person]) });
-                    else if (personBalances[person] > 0.01) creditors.push({ person, amount: personBalances[person] });
-                }
                         const peopleWhoPaid = people.filter(p => totalPaid[p] > 0);
                         if (peopleWhoPaid.length > 0) {
                             doc.autoTable({
@@ -1129,46 +1013,12 @@
                             });
                         }
 
-                let debtorIndex = 0, creditorIndex = 0;
-                const settlements = [];
-                while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
-                    const debtor = debtors[debtorIndex], creditor = creditors[creditorIndex];
-                    const settlementAmount = Math.min(debtor.amount, creditor.amount);
-                    settlements.push([debtor.person, creditor.person, `Rs. ${settlementAmount.toFixed(2)}`]);
-                    debtor.amount -= settlementAmount;
-                    creditor.amount -= settlementAmount;
-                    if (debtor.amount <= 0.01) debtorIndex++;
-                    if (creditor.amount <= 0.01) creditorIndex++;
-                }
-                
-                doc.autoTable({
-                    head: [['Final Settlements']],
-                    body: [],
-                    startY: doc.autoTable.previous.finalY + 10,
-                    theme: 'plain',
-                    headStyles: { fontStyle: 'bold', fontSize: 12, textColor: '#1f2937' },
-                    margin: { left: margin }
-                });
                         const debtors = [], creditors = [];
                         for (const person in personBalances) {
                             if (personBalances[person] < -0.01) debtors.push({ person, amount: Math.abs(personBalances[person]) });
                             else if (personBalances[person] > 0.01) creditors.push({ person, amount: personBalances[person] });
                         }
 
-                if (settlements.length > 0) {
-                     doc.autoTable({
-                         startY: doc.autoTable.previous.finalY,
-                         head: [['Who Pays', 'Who Gets Paid', 'Amount']],
-                         body: settlements,
-                         theme: 'grid',
-                         headStyles: { fillColor: [229, 231, 235], textColor: [55, 65, 81], fontStyle: 'bold' },
-                         styles: { font: 'Helvetica', cellPadding: 2, fontSize: 10 },
-                         margin: { left: margin, right: margin }
-                     });
-                } else {
-                    doc.setFont('Helvetica', 'normal'); doc.setTextColor('#10b981');
-                    doc.text('Everything is settled!', margin, doc.autoTable.previous.finalY + 5);
-                }
                         let debtorIndex = 0, creditorIndex = 0;
                         const settlements = [];
                         while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
@@ -1190,8 +1040,6 @@
                             margin: { left: margin }
                         });
 
-                const pageCount = doc.internal.getNumberOfPages();
-                const generationTimestamp = new Date();
                         if (settlements.length > 0) {
                              doc.autoTable({
                                  startY: doc.autoTable.previous.finalY,
@@ -1207,48 +1055,16 @@
                             doc.text('Everything is settled!', margin, doc.autoTable.previous.finalY + 5);
                         }
 
-                for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    
-                    // Add watermark
-                    const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-                    const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-                    
-                    doc.saveGraphicsState(); // Save the current state before transformations
-                    
-                    doc.setFont('Helvetica', 'bold');
-                    doc.setFontSize(60);
-                    doc.setTextColor(150);
-                    
-                    const GState = window.jspdf.GState;
-                    doc.setGState(new GState({opacity: 0.07}));
-                    
-                    doc.text('JAY DWARKADHISH', pageWidth / 1.6, pageHeight / 3.5, {
-                        align: 'center',
-                        baseline: 'middle',
-                        angle: -45
-                    });
-                    
-                    doc.restoreGraphicsState(); // Restore the state so the footer is not rotated
-
-                    // Add footer
-                    doc.setFontSize(8);
-                    doc.setFont('Helvetica', 'normal');
-                    doc.setTextColor('#4b5563');
-                    doc.text(`Generated on: ${generationTimestamp.toLocaleDateString('en-GB')} at ${generationTimestamp.toLocaleTimeString()}`, margin, pageHeight - 10);
-                    doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - margin, pageHeight - 10, { align: 'right' });
-                }
                         const pageCount = doc.internal.getNumberOfPages();
                         const generationTimestamp = new Date();
 
                         for (let i = 1; i <= pageCount; i++) {
                             doc.setPage(i);
                             
-                            // Add watermark
                             const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
                             const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
                             
-                            doc.saveGraphicsState(); // Save the current state before transformations
+                            doc.saveGraphicsState();
                             
                             doc.setFont('Helvetica', 'bold');
                             doc.setFontSize(60);
@@ -1263,9 +1079,8 @@
                                 angle: -45
                             });
                             
-                            doc.restoreGraphicsState(); // Restore the state so the footer is not rotated
+                            doc.restoreGraphicsState();
 
-                            // Add footer
                             doc.setFontSize(8);
                             doc.setFont('Helvetica', 'normal');
                             doc.setTextColor('#4b5563');
@@ -1273,7 +1088,6 @@
                             doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - margin, pageHeight - 10, { align: 'right' });
                         }
 
-                doc.save(`${currentTourName.replace(/ /g, '_')}_report.pdf`);
                         doc.save(`${currentTourName.replace(/ /g, '_')}_report.pdf`);
                     } catch (error) {
                         console.error("Error generating PDF:", error);
@@ -1325,12 +1139,12 @@
                     showModal('customModal');
                 }
             }
-
+            
             function showConfirm(title, message, onConfirm) {
                 modalTitle.textContent = title;
                 modalMessage.textContent = message;
                 modalButtons.innerHTML = '';
-
+                
                 const cancelBtn = document.createElement('button');
                 cancelBtn.textContent = 'Cancel';
                 cancelBtn.className = 'px-4 py-2 glass-button rounded-lg font-semibold hover:bg-gray-600 transition-colors';
@@ -1355,7 +1169,7 @@
             cancelAddPersonBtn.addEventListener('click', () => {
                 hideModal('addPersonModal');
             });
-
+            
             confirmAddPersonBtn.addEventListener('click', () => {
                 const names = personInput.value.split(',').map(name => name.trim()).filter(name => name !== '');
                 if (names.length > 0) {
@@ -1386,13 +1200,13 @@
                 if (newName && originalNameForEdit) {
                     const index = people.indexOf(originalNameForEdit);
                     if (index > -1) people[index] = newName;
-
+                    
                     expenses.forEach(expense => {
                         if (expense.paidBy === originalNameForEdit) expense.paidBy = newName;
                         const splitIndex = expense.splitAmong.indexOf(originalNameForEdit);
                         if (splitIndex > -1) expense.splitAmong[splitIndex] = newName;
                     });
-
+                    
                     originalNameForEdit = null;
                     saveData();
                     renderAll();
@@ -1406,7 +1220,7 @@
                         const personToRemove = selectedPersonForRemoval;
                         const index = people.indexOf(personToRemove);
                         if (index > -1) people.splice(index, 1);
-
+                        
                         const updatedExpenses = expenses.filter(expense => {
                             const paidByRemoved = expense.paidBy === personToRemove;
                             const splitContainsOnlyRemoved = expense.splitAmong.length === 1 && expense.splitAmong[0] === personToRemove;
@@ -1417,7 +1231,7 @@
                             const splitIndex = expense.splitAmong.indexOf(personToRemove);
                             if (splitIndex > -1) expense.splitAmong.splice(splitIndex, 1);
                         });
-
+                        
                         expenses.length = 0;
                         expenses.push(...updatedExpenses);
 
@@ -1457,7 +1271,7 @@
                     "Clear All Records",
                     "Are you sure you want to delete all tour info, people, and expenses? This action cannot be undone.",
                     () => {
-                        tourName = 'Expense Splitter';
+                        tourName = '';
                         tripStartDate = '';
                         tripEndDate = '';
                         people.length = 0;
@@ -1481,7 +1295,7 @@
                         const importedData = JSON.parse(event.target.result);
                         if (importedData.people && importedData.expenses) {
                             showConfirm("Import Data", "Are you sure you want to overwrite your current data with this file?", () => {
-                                tourName = importedData.tourName || 'Expense Splitter';
+                                tourName = importedData.tourName || '';
                                 tripStartDate = importedData.tripStartDate || '';
                                 tripEndDate = importedData.tripEndDate || '';
                                 people.length = 0;
@@ -1524,32 +1338,15 @@
             renderAll();
             setTodayDate();
 
-            if (donationsBtn && donationsModal) {
-                donationsBtn.addEventListener('click', () => {
-                    showModal('donations-modal');
-                });
-                const closeDonationsBtn = donationsModal.querySelector('.close-modal-btn');
-                if (closeDonationsBtn) {
-                    closeDonationsBtn.addEventListener('click', () => {
-                        hideModal('donations-modal');
-                    });
-                }
-            }
-
-            window.copyDonationDetails = function(elementId) {
-                const copyText = document.getElementById(elementId).innerText;
-                const textarea = document.createElement('textarea');
-                textarea.value = copyText;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showAlert("Success", "Copied to clipboard!");
-            };
         };
     </script>
+    
     <footer class="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-        <p class="mb-1">© 2025 Quick Expense Split Counter. All Rights Reserved.</p>
+        <p class="mb-2">
+            <a href="contact.html" class="text-blue-500 hover:underline">Contact Us</a> | 
+            <a href="report.html" class="text-blue-500 hover:underline">Report an Issue</a>
+        </p>
+        <p class="mb-1">Copyright © 2025 Dwarkvyn. All Rights Reserved.</p>
         <p>Designed with ❤️ in INDIA | <a href="https://www.instagram.com/hookstar.fx" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">HOOK STAR.</a></p>
     </footer>
 </body>
