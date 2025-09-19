@@ -51,44 +51,59 @@
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Report an Issue</h1>
         </div>
         
-        <div class="text-gray-700 space-y-4">
-            <p>Found a bug or have an issue? We are sorry for the inconvenience. Please describe the problem in detail below. Submitting this form will open your default email client.</p>
+        <div id="formContainer" class="text-gray-700 space-y-4">
+            <p>Found a bug or have an issue? We are sorry for the inconvenience. Please describe the problem in detail below. Your report will be sent directly to our team.</p>
 
-            <form id="reportForm" class="space-y-4 pt-4">
+            <form id="reportForm" action="https://formsubmit.co/dwarkvyn.report@gmail.com" method="POST" class="space-y-4 pt-4">
+                
+                <input type="hidden" name="_subject" value="New Report - Trip Expense Splitter">
+                <!-- Disable captcha for AJAX -->
+                <input type="hidden" name="_captcha" value="false">
+
                 <div>
                     <label for="reportName" class="block text-sm font-medium text-gray-900">Your Name</label>
-                    <input type="text" id="reportName" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <input type="text" id="reportName" name="Name" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
                 </div>
                 <div>
                     <label for="reportEmail" class="block text-sm font-medium text-gray-900">Your Email (for follow-up)</label>
-                    <input type="email" id="reportEmail" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <input type="email" id="reportEmail" name="Email" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
                 </div>
                 <div>
                     <label for="platformType" class="block text-sm font-medium text-gray-900">Platform</label>
-                     <select id="platformType" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                        <option>Website</option>
-                        <option>Android App</option>
-                    </select>
+                     <select id="platformType" name="Platform" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                         <option>Website</option>
+                         <option>Android App</option>
+                     </select>
                 </div>
                 <div>
                     <label for="issueType" class="block text-sm font-medium text-gray-900">Type of Issue</label>
-                     <select id="issueType" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                        <option>Bug / Error</option>
-                        <option>Calculation Problem</option>
-                        <option>PDF Generation Issue</option>
-                        <option>Feature Suggestion</option>
-                        <option>Other</option>
-                    </select>
+                     <select id="issueType" name="Issue_Type" required class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                         <option>Bug / Error</option>
+                         <option>Calculation Problem</option>
+                         <option>PDF Generation Issue</option>
+                         <option>Feature Suggestion</option>
+                         <option>Other</option>
+                     </select>
                 </div>
                 <div>
                     <label for="reportDescription" class="block text-sm font-medium text-gray-900">Description of Issue</label>
-                    <textarea id="reportDescription" rows="5" required placeholder="Please describe the steps to reproduce the issue..." class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
+                    <textarea id="reportDescription" name="Description" rows="5" required placeholder="Please describe the steps to reproduce the issue..." class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
                 </div>
+                <!-- Error Message Container -->
+                <div id="errorMessage" class="hidden p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert"></div>
                 <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105">
-                    Prepare Report Email
+                    Submit Report
                 </button>
             </form>
         </div>
+        
+        <!-- Thank You Message Container -->
+        <div id="thankYouMessage" class="hidden text-center py-10">
+            <svg class="mx-auto mb-4 w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h2 class="text-2xl font-bold mb-2 text-gray-900">Thank You!</h2>
+            <p class="text-gray-700">Your report has been submitted successfully. We appreciate your feedback.</p>
+        </div>
+
     </div>
     
     <div id="themeToggle" class="fixed bottom-5 right-5 z-50 p-2 rounded-full cursor-pointer bg-white/30 dark:bg-black/30 backdrop-blur-md transition-all duration-500 flex items-center justify-center space-x-2">
@@ -105,6 +120,7 @@
     </div>
     
     <script>
+        // --- Theme Switcher Logic (No changes here) ---
         const themeCheckbox = document.getElementById('theme-checkbox');
         const moonIcon = document.getElementById('moonIcon');
         const sunIcon = document.getElementById('sunIcon');
@@ -138,23 +154,59 @@
             });
         }
 
+        // --- AJAX Form Submission Logic ---
         const reportForm = document.getElementById('reportForm');
-        reportForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+        const formContainer = document.getElementById('formContainer');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        const submitButton = reportForm.querySelector('button[type="submit"]');
 
-            const name = document.getElementById('reportName').value;
-            const email = document.getElementById('reportEmail').value;
-            const platform = document.getElementById('platformType').value;
-            const issueType = document.getElementById('issueType').value;
-            const description = document.getElementById('reportDescription').value;
+        reportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-            const subject = `Issue Report: ${issueType} on ${platform}`;
-            const body = `Name: ${name}\nEmail: ${email}\n\nPlatform: ${platform}\nIssue Type: ${issueType}\n\nDescription:\n${description}`;
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = 'Submitting...';
+            submitButton.disabled = true;
+            errorMessageDiv.classList.add('hidden');
 
-            const mailtoLink = `mailto:dwarkvyn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            window.location.href = mailtoLink;
+            const formData = new FormData(reportForm);
+            const action = reportForm.getAttribute('action');
+
+            fetch(action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                return response.json().then(data => {
+                    let errorMsg = 'Oops! There was a problem submitting your form.';
+                    if (data && data.errors) {
+                        errorMsg = data.errors.map(err => err.message).join('<br>');
+                    }
+                    throw new Error(errorMsg);
+                });
+            }).then(data => {
+                if (data.success) {
+                    formContainer.classList.add('hidden');
+                    thankYouMessage.classList.remove('hidden');
+                    reportForm.reset();
+                } else {
+                    throw new Error('Submission was not successful.');
+                }
+            }).catch(error => {
+                console.error('Submission Error:', error);
+                errorMessageDiv.innerHTML = error.message;
+                errorMessageDiv.classList.remove('hidden');
+            }).finally(() => {
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            });
         });
+        
     </script>
     
     <footer class="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
