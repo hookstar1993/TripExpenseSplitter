@@ -54,7 +54,7 @@
         <div id="formContainer" class="text-gray-700 space-y-4">
             <p>Found a bug or have an issue? We are sorry for the inconvenience. Please describe the problem in detail below. Your report will be sent directly to our team.</p>
 
-            <form id="reportForm" action="https://formsubmit.co/2023.hardeep@gmail.com" method="POST" class="space-y-4 pt-4">
+            <form id="reportForm" action="https://formsubmit.co/dwarkvyn.report@gmail.com" method="POST" class="space-y-4 pt-4">
                 
                 <input type="hidden" name="_subject" value="New Report - Trip Expense Splitter">
                 <!-- Disable captcha for AJAX -->
@@ -182,31 +182,17 @@
                 }
             }).then(response => {
                 if (response.ok) {
-                    return response.json();
-                }
-                return response.json().then(data => {
-                    let errorMsg = 'Oops! There was a problem submitting your form.';
-                    if (data && data.errors) {
-                        errorMsg = data.errors.map(err => err.message).join('<br>');
-                    }
-                    throw new Error(errorMsg);
-                });
-            }).then(data => {
-                if (data.success) {
+                    // The submission was successful. Show the thank you message.
                     formContainer.classList.add('hidden');
                     thankYouMessage.classList.remove('hidden');
                     reportForm.reset();
                 } else {
-                    throw new Error('Submission was not successful.');
+                    // The submission failed.
+                    throw new Error('Oops! There was a problem submitting your form. Please try again.');
                 }
             }).catch(error => {
                 console.error('Submission Error:', error);
-                // Check for the specific JSON parsing error from an HTML response
-                if (error instanceof SyntaxError && error.message.includes("Unexpected token")) {
-                    errorMessageDiv.innerHTML = "There was an unexpected response from the server. This can happen if the destination email hasn't been activated yet. Please check your inbox for a FormSubmit.co activation link.";
-                } else {
-                    errorMessageDiv.innerHTML = error.message;
-                }
+                errorMessageDiv.innerHTML = error.message;
                 errorMessageDiv.classList.remove('hidden');
             }).finally(() => {
                 submitButton.innerHTML = originalButtonText;
@@ -226,3 +212,4 @@
     </footer>
 </body>
 </html>
+
