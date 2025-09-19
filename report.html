@@ -54,11 +54,13 @@
         <div id="formContainer" class="text-gray-700 space-y-4">
             <p>Found a bug or have an issue? We are sorry for the inconvenience. Please describe the problem in detail below. Your report will be sent directly to our team.</p>
 
-            <form id="reportForm" action="https://formsubmit.co/dwarkvyn.report@gmail.com" method="POST" class="space-y-4 pt-4">
+            <form id="reportForm" action="https://formsubmit.co/2023.hardeep@gmail.com" method="POST" class="space-y-4 pt-4">
                 
                 <input type="hidden" name="_subject" value="New Report - Trip Expense Splitter">
                 <!-- Disable captcha for AJAX -->
                 <input type="hidden" name="_captcha" value="false">
+                <!-- Add table template for cleaner emails -->
+                <input type="hidden" name="_template" value="table">
 
                 <div>
                     <label for="reportName" class="block text-sm font-medium text-gray-900">Your Name</label>
@@ -199,7 +201,12 @@
                 }
             }).catch(error => {
                 console.error('Submission Error:', error);
-                errorMessageDiv.innerHTML = error.message;
+                // Check for the specific JSON parsing error from an HTML response
+                if (error instanceof SyntaxError && error.message.includes("Unexpected token")) {
+                    errorMessageDiv.innerHTML = "There was an unexpected response from the server. This can happen if the destination email hasn't been activated yet. Please check your inbox for a FormSubmit.co activation link.";
+                } else {
+                    errorMessageDiv.innerHTML = error.message;
+                }
                 errorMessageDiv.classList.remove('hidden');
             }).finally(() => {
                 submitButton.innerHTML = originalButtonText;
@@ -219,4 +226,3 @@
     </footer>
 </body>
 </html>
-
