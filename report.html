@@ -17,6 +17,7 @@
         body.dark .text-gray-900{color:#d1d5db}body.dark .text-gray-700{color:#d1d5db}
         body.dark input, body.dark select, body.dark textarea {background-color: #1f2937; color: #d1d5db; border-color: #4b5563;}
         .switch{position:relative;display:inline-block;width:60px;height:34px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#4b5563;transition:.4s;border-radius:34px}.slider:before{position:absolute;content:"";height:26px;width:26px;left:4px;bottom:4px;background-color:white;transition:.4s;border-radius:50%}input:checked+.slider{background-color:#2196F3}input:checked+.slider:before{transform:translateX(26px)}
+        .active-link {background-color: #3b82f6 !important; color: #ffffff !important;} .active-link:hover { background-color: #2563eb !important;}
     </style>
 </head>
 <body class="p-4 sm:p-8 pb-24 pt-24">
@@ -32,7 +33,7 @@
                 <div class="hidden sm:block">
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="contact.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Contact</a>
-                        <a href="report.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Report Issue</a>
+                        <a href="report.html" class="px-3 py-2 rounded-md text-sm font-medium active-link">Report Issue</a>
                         <a href="terms.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Terms</a>
                         <a href="privacy.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Privacy</a>
                         <a href="misuse.html" class="text-gray-700 dark:text-gray-300 hover:bg-gray-500/20 px-3 py-2 rounded-md text-sm font-medium">Acceptable Use</a>
@@ -57,9 +58,7 @@
             <form id="reportForm" action="https://formsubmit.co/dwarkvyn.report@gmail.com" method="POST" class="space-y-4 pt-4">
                 
                 <input type="hidden" name="_subject" value="New Report - Trip Expense Splitter">
-                <!-- Disable captcha for AJAX -->
                 <input type="hidden" name="_captcha" value="false">
-                <!-- Add table template for cleaner emails -->
                 <input type="hidden" name="_template" value="table">
 
                 <div>
@@ -91,8 +90,6 @@
                     <label for="reportDescription" class="block text-sm font-medium text-gray-900">Description of Issue</label>
                     <textarea id="reportDescription" name="Description" rows="5" required placeholder="Please describe the steps to reproduce the issue..." class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
                 </div>
-                <!-- Error Message Container -->
-                <div id="errorMessage" class="hidden p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert"></div>
                 <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105">
                     Submit Report
                 </button>
@@ -104,6 +101,16 @@
             <svg class="mx-auto mb-4 w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <h2 class="text-2xl font-bold mb-2 text-gray-900">Thank You!</h2>
             <p class="text-gray-700">Your report has been submitted successfully. We appreciate your feedback.</p>
+            <div class="pt-4">
+                <button id="sendAnotherReportBtn" class="bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105 inline-block">
+                    Submit Another Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Error message container, hidden by default -->
+        <div id="errorMessage" class="hidden text-center text-red-500 mt-4">
+            <p>Oops! Something went wrong while sending your report. Please try again later.</p>
         </div>
 
     </div>
@@ -157,19 +164,19 @@
         }
 
         // --- AJAX Form Submission Logic ---
-        const reportForm = document.getElementById('reportForm');
         const formContainer = document.getElementById('formContainer');
+        const reportForm = document.getElementById('reportForm');
         const thankYouMessage = document.getElementById('thankYouMessage');
-        const errorMessageDiv = document.getElementById('errorMessage');
+        const errorMessage = document.getElementById('errorMessage');
         const submitButton = reportForm.querySelector('button[type="submit"]');
+        const sendAnotherReportBtn = document.getElementById('sendAnotherReportBtn');
 
         reportForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
             const originalButtonText = submitButton.innerHTML;
-            submitButton.innerHTML = 'Submitting...';
             submitButton.disabled = true;
-            errorMessageDiv.classList.add('hidden');
+            submitButton.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Submitting...`;
 
             const formData = new FormData(reportForm);
             const action = reportForm.getAttribute('action');
@@ -182,22 +189,27 @@
                 }
             }).then(response => {
                 if (response.ok) {
-                    // The submission was successful. Show the thank you message.
                     formContainer.classList.add('hidden');
                     thankYouMessage.classList.remove('hidden');
-                    reportForm.reset();
+                    errorMessage.classList.add('hidden');
                 } else {
-                    // The submission failed.
                     throw new Error('Oops! There was a problem submitting your form. Please try again.');
                 }
             }).catch(error => {
                 console.error('Submission Error:', error);
-                errorMessageDiv.innerHTML = error.message;
-                errorMessageDiv.classList.remove('hidden');
+                errorMessage.querySelector('p').textContent = error.message;
+                errorMessage.classList.remove('hidden');
             }).finally(() => {
                 submitButton.innerHTML = originalButtonText;
                 submitButton.disabled = false;
             });
+        });
+
+        sendAnotherReportBtn.addEventListener('click', () => {
+            thankYouMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            reportForm.reset();
+            formContainer.classList.remove('hidden');
         });
         
     </script>
